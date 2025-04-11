@@ -5,8 +5,23 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:FCInvoiceUI.Views"
         mc:Ignorable="d"
-        Title="MainView" Height="450" Width="800">
+        Title="MainView"
+        Height="800"
+        Width="1200"
+        WindowStartupLocation="CenterScreen">
+
     <Grid>
+        <!-- Background -->
+        <Grid.Background>
+            <LinearGradientBrush StartPoint="0,0"
+                                 EndPoint="1,1">
+                <GradientStop Color="{StaticResource primaryBackColor}"
+                              Offset="0.0" />
+                <GradientStop Color="{StaticResource secondaryBackColor}"
+                              Offset="1.0" />
+            </LinearGradientBrush>
+        </Grid.Background>
+        
         
     </Grid>
 </Window>
