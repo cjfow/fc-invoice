@@ -5,7 +5,10 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:FCInvoiceUI.Views"
+        xmlns:vm="clr-namespace:FCInvoiceUI.ViewModels"
+        xmlns:models="clr-namespace:FCInvoiceUI.Models"
         mc:Ignorable="d"
+        d:DataContext="{d:DesignInstance Type=vm:MainViewModel, IsDesignTimeCreatable=True}"
         Title="MainView"
         Height="800"
         Width="1200"
@@ -21,10 +24,10 @@
         <Grid.Background>
             <LinearGradientBrush StartPoint="0,0"
                                  EndPoint="1,1">
-                
+
                 <GradientStop Color="{StaticResource primaryBackColor}"
                               Offset="0.0" />
-                
+
                 <GradientStop Color="{StaticResource secondaryBackColor}"
                               Offset="1.0" />
             </LinearGradientBrush>
@@ -39,13 +42,13 @@
             <RowDefinition Height="*" />
 
             <RowDefinition Height="Auto" />
-            
+
         </Grid.RowDefinitions>
 
         <!-- row 0: header section -->
         <Grid Grid.Row="0"
               Margin="20">
-            
+
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="Auto" />
@@ -64,14 +67,14 @@
             <StackPanel Grid.Column="1"
                         Orientation="Horizontal"
                         Margin="20,0">
-                
+
                 <TextBlock Text="Select Date:" 
                            VerticalAlignment="Center" 
                            Margin="0,0,5,0"/>
 
                 <DatePicker Width="120"
                             Height="30" 
-                            SelectedDate="{x:Static sys:DateTime.Today}" 
+                            SelectedDate="{Binding SelectedDate, Mode=TwoWay}"
                             SelectedDateFormat="Short">
 
                     <DatePicker.Resources>
@@ -83,7 +86,7 @@
                             <Setter Property="Margin"
                                     Value="0"/>
                             <Setter Property="Template">
-                                
+
                                 <Setter.Value>
                                     <ControlTemplate TargetType="DatePickerTextBox">
                                         <TextBox x:Name="PART_TextBox"
@@ -106,26 +109,30 @@
             <StackPanel Grid.Column="2"
                         Orientation="Horizontal"
                         Margin="20,0">
-                
+
                 <TextBlock Text="Invoice #:" 
                            VerticalAlignment="Center" 
                            Margin="0,0,5,0"/>
-                
-                <TextBox Width="100" Height="30" 
-                         VerticalContentAlignment="Center"/>
+
+                <TextBox Width="100" 
+                         Height="30" 
+                         VerticalContentAlignment="Center"
+                         Text="{Binding InvoiceNumber, Mode=TwoWay}"/>
             </StackPanel>
 
             <!-- project number textbox -->
             <StackPanel Grid.Column="3"
                         Orientation="Horizontal"
                         Margin="20,0">
-                
+
                 <TextBlock Text="Project #:" 
                            VerticalAlignment="Center" 
                            Margin="0,0,5,0"/>
-                
-                <TextBox Width="100" Height="30" 
-                         VerticalContentAlignment="Center"/>
+
+                <TextBox Width="100"
+                         Height="30" 
+                         VerticalContentAlignment="Center"
+                         Text="{Binding ProjectNumber, Mode=TwoWay}"/>
             </StackPanel>
         </Grid>
 
@@ -133,33 +140,36 @@
         <StackPanel Grid.Row="1"
                     Orientation="Horizontal"
                     Margin="20,0">
-            
+
             <TextBlock Text="Bill:" 
                        VerticalAlignment="Center" 
                        Margin="0,0,5,0"/>
-            
+
             <!-- textbox for the name of who to bill -->
             <TextBox Width="300"
                      Height="30" 
-                     VerticalContentAlignment="Center"/>
+                     VerticalContentAlignment="Center"
+                     Text="{Binding BillTo, Mode=TwoWay}"/>
         </StackPanel>
 
         <!-- row 2: invoice details area -->
-        <Grid Grid.Row="2" Margin="20">
+        <Grid Grid.Row="2"
+              Margin="20">
+
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
-                
+
                 <!-- column headers -->
                 <RowDefinition Height="*" />
                 <!-- invoice items area (scrollable if the length is too long) -->
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="100" />
-                
+
                 <ColumnDefinition Width="*" />
-                
+
                 <ColumnDefinition Width="100" />
-                
+
                 <ColumnDefinition Width="100" />
             </Grid.ColumnDefinitions>
 
@@ -169,71 +179,79 @@
                        Text="Quantity"
                        HorizontalAlignment="Center"
                        Margin="0,0,0,5"/>
-            
+
             <TextBlock Grid.Row="0"
                        Grid.Column="1"
                        Text="Description"
                        HorizontalAlignment="Center"
                        Margin="0,0,0,5"/>
-            
+
             <TextBlock Grid.Row="0"
                        Grid.Column="2"
                        Text="Rate"
-                       HorizontalAlignment="Center"
-                       Margin="0,0,0,5"/>
-            
+                       HorizontalAlignment="Left"
+                       Margin="18,0,0,5"/>
+
             <TextBlock Grid.Row="0"
                        Grid.Column="3"
                        Text="Amount"
-                       HorizontalAlignment="Center"
-                       Margin="0,0,0,5"/>
+                       HorizontalAlignment="Left"
+                       Margin="10,0,0,5"/>
 
             <!-- invoice item placeholder -->
             <ScrollViewer Grid.Row="1"
                           Grid.ColumnSpan="4"
                           VerticalScrollBarVisibility="Auto">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="100" />
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="100" />
-                        <ColumnDefinition Width="100" />
-                    </Grid.ColumnDefinitions>
+                <ItemsControl ItemsSource="{Binding InvoiceItems}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Grid Margin="2">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="100" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="100" />
+                                    <ColumnDefinition Width="100" />
+                                </Grid.ColumnDefinitions>
+                                <!-- quantity textbox -->
+                                <TextBox Grid.Column="0"
+                                         Height="550"
+                                         Margin="5"
+                                         AcceptsReturn="True"
+                                         TextWrapping="Wrap"
+                                         Text="{Binding QuantityText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                <!-- description textbox -->
+                                <TextBox Grid.Column="1"
+                                         Margin="5"
+                                         Height="550"
+                                         AcceptsReturn="True"
+                                         TextWrapping="Wrap"
+                                         Text="{Binding Description, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                <!-- rate textbox -->
+                                <TextBox Grid.Column="2"
+                                         Margin="5"
+                                         Height="550"
+                                         AcceptsReturn="True"
+                                         TextWrapping="Wrap"
+                                         Text="{Binding RateText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                <!-- read only amount textbox -->
+                                <TextBox Grid.Column="3"
+                                         Margin="5"
+                                         Height="550"
+                                         Text="{Binding Amount, Mode=OneWay, StringFormat='{}{0:N2}'}"
+                                         IsReadOnly="True"
+                                         IsTabStop="False"/>
 
-                    <!-- quantity textbox -->
-                    <TextBox Grid.Column="0"
-                             Margin="5"
-                             Text=""
-                             TabIndex="0"/>
-                    
-                    <!-- description textbox -->
-                    <TextBox Grid.Column="1"
-                             Margin="5"
-                             AcceptsReturn="True"
-                             TextWrapping="Wrap"
-                             Text=""
-                             TabIndex="1"/>
-                    
-                    <!-- rate textbox -->
-                    <TextBox Grid.Column="2"
-                             Margin="5"
-                             Text=""
-                             TabIndex="2"/>
-                    
-                    <!-- read only amount textbox -->
-                    <TextBox Grid.Column="3"
-                             Margin="5"
-                             Text=""
-                             IsReadOnly="True"
-                             IsTabStop="False"/>
-                </Grid>
+                            </Grid>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
             </ScrollViewer>
         </Grid>
 
         <!-- row 3: footer -->
         <Grid Grid.Row="3"
-              Margin="10">
-            
+              Margin="15">
+
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="Auto" />
@@ -243,20 +261,29 @@
             <Button Grid.Column="0"
                     Content="Preview Print"
                     HorizontalAlignment="Center"
+                    Margin="300,0,0,0"
                     Width="150"
-                    Height="30"/>
+                    Height="35"
+                    Command="{Binding PreviewPrintCommand}"/>
+
+            <Button Grid.Column="0"
+                    Content="Load Previous Invoices"
+                    HorizontalAlignment="Center"
+                    Margin="0,0,300,0"
+                    Width="190"
+                    Command="{Binding LoadPreviousInvoicesCommand}"/>
 
             <!-- total display -->
             <StackPanel Grid.Column="1"
                         Margin="0,0,20,0"
                         Orientation="Horizontal"
                         HorizontalAlignment="Right">
-                
+
                 <TextBlock Text="Total:" 
                            VerticalAlignment="Center"
                            Margin="0,0,5,0"/>
-                
-                <TextBlock Text="$ (sum of amounts)"
+
+                <TextBlock Text="{Binding Total, StringFormat='{}${0:N2}'}"
                            VerticalAlignment="Center"/>
             </StackPanel>
         </Grid>
