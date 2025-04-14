@@ -201,7 +201,7 @@
             <!-- invoice item placeholder -->
             <ScrollViewer Grid.Row="1"
                           Grid.ColumnSpan="4"
-                          VerticalScrollBarVisibility="Auto">
+                          VerticalScrollBarVisibility="Hidden">
                 <ItemsControl ItemsSource="{Binding InvoiceItems}">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
@@ -214,33 +214,34 @@
                                 </Grid.ColumnDefinitions>
                                 <!-- quantity textbox -->
                                 <TextBox Grid.Column="0"
-                                         Height="550"
+                                         Height="530"
                                          Margin="5"
                                          AcceptsReturn="True"
                                          TextWrapping="Wrap"
+                                         PreviewTextInput="NumericOnly_PreviewTextInput"
+                                         DataObject.Pasting="NumericOnly_Pasting"
                                          Text="{Binding QuantityText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                                 <!-- description textbox -->
                                 <TextBox Grid.Column="1"
                                          Margin="5"
-                                         Height="550"
+                                         Height="530"
                                          AcceptsReturn="True"
                                          TextWrapping="Wrap"
                                          Text="{Binding Description, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                                 <!-- rate textbox -->
                                 <TextBox Grid.Column="2"
                                          Margin="5"
-                                         Height="550"
+                                         Height="530"
                                          AcceptsReturn="True"
                                          TextWrapping="Wrap"
                                          Text="{Binding RateText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-                                <!-- read only amount textbox -->
-                                <TextBox Grid.Column="3"
-                                         Margin="5"
-                                         Height="550"
-                                         Text="{Binding Amount, Mode=OneWay, StringFormat='{}{0:N2}'}"
-                                         IsReadOnly="True"
-                                         IsTabStop="False"/>
-
+                                <!--- amount textblock -->
+                                <TextBlock Grid.Column="3"
+                                           Margin="5"
+                                           Height="530"
+                                           Text="{Binding Amount, Mode=OneWay, StringFormat='{}{0:N2}'}"
+                                           Background="White"
+                                           Padding="5"/>
                             </Grid>
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
