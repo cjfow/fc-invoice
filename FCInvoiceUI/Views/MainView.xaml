@@ -22,33 +22,22 @@
     <Grid>
         <!-- background gradient -->
         <Grid.Background>
-            <LinearGradientBrush StartPoint="0,0"
-                                 EndPoint="1,1">
-
-                <GradientStop Color="{StaticResource primaryBackColor}"
-                              Offset="0.0" />
-
-                <GradientStop Color="{StaticResource secondaryBackColor}"
-                              Offset="1.0" />
+            <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                <GradientStop Color="{StaticResource primaryBackColor}" Offset="0.0" />
+                <GradientStop Color="{StaticResource secondaryBackColor}" Offset="1.0" />
             </LinearGradientBrush>
         </Grid.Background>
 
         <!-- 4 rows: header, bill row, main content, footer where the button and total is -->
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
-
             <RowDefinition Height="Auto" />
-
             <RowDefinition Height="*" />
-
             <RowDefinition Height="Auto" />
-
         </Grid.RowDefinitions>
 
         <!-- row 0: header section -->
-        <Grid Grid.Row="0"
-              Margin="20">
-
+        <Grid Grid.Row="0" Margin="20">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="Auto" />
@@ -58,45 +47,38 @@
 
             <!-- program title -->
             <TextBlock Grid.Column="0"
-                       Text="Simplified Invoice Program"
-                       FontSize="16"
-                       VerticalAlignment="Center"
-                       Margin="20,0,20,0"/>
+                   Text="Simplified Invoice Program"
+                   FontSize="16"
+                   VerticalAlignment="Center"
+                   Margin="20,0,20,0"/>
 
             <!-- select date datepicker -->
             <StackPanel Grid.Column="1"
-                        Orientation="Horizontal"
-                        Margin="20,0">
-
+                    Orientation="Horizontal"
+                    Margin="20,0">
                 <TextBlock Text="Select Date:" 
-                           VerticalAlignment="Center" 
-                           Margin="0,0,5,0"/>
-
+                       VerticalAlignment="Center" 
+                       Margin="0,0,5,0"/>
                 <DatePicker Width="120"
-                            Height="30" 
-                            SelectedDate="{Binding SelectedDate, Mode=TwoWay}"
-                            SelectedDateFormat="Short">
-
+                        Height="30" 
+                        SelectedDate="{Binding SelectedDate, Mode=TwoWay}"
+                        SelectedDateFormat="Short">
                     <DatePicker.Resources>
                         <Style TargetType="DatePickerTextBox">
-                            <Setter Property="VerticalContentAlignment"
-                                    Value="Center"/>
-                            <Setter Property="Padding"
-                                    Value="0,0,0,0"/>
-                            <Setter Property="Margin"
-                                    Value="0"/>
+                            <Setter Property="VerticalContentAlignment" Value="Center"/>
+                            <Setter Property="Padding" Value="0,0,0,0"/>
+                            <Setter Property="Margin" Value="0"/>
                             <Setter Property="Template">
-
                                 <Setter.Value>
                                     <ControlTemplate TargetType="DatePickerTextBox">
                                         <TextBox x:Name="PART_TextBox"
-                                                 Height="30"
-                                                 Padding="0,-7,0,0"
-                                                 Margin="0"
-                                                 VerticalContentAlignment="Center"
-                                                 Text="{Binding RelativeSource={RelativeSource AncestorType=DatePicker}, 
-                                                 Path=SelectedDate, 
-                                                 StringFormat='{}{0:d MMM yy}'}" />
+                                             Height="30"
+                                             Padding="0,-7,0,0"
+                                             Margin="0"
+                                             VerticalContentAlignment="Center"
+                                             Text="{Binding RelativeSource={RelativeSource AncestorType=DatePicker}, 
+                                             Path=SelectedDate, 
+                                             StringFormat='{}{0:d MMM yy}'}" />
                                     </ControlTemplate>
                                 </Setter.Value>
                             </Setter>
@@ -107,185 +89,138 @@
 
             <!-- invoice number textbox -->
             <StackPanel Grid.Column="2"
-                        Orientation="Horizontal"
-                        Margin="20,0">
-
+                    Orientation="Horizontal"
+                    Margin="20,0">
                 <TextBlock Text="Invoice #:" 
-                           VerticalAlignment="Center" 
-                           Margin="0,0,5,0"/>
-
+                       VerticalAlignment="Center" 
+                       Margin="0,0,5,0"/>
                 <TextBox Width="100" 
-                         Height="30" 
-                         VerticalContentAlignment="Center"
-                         Text="{Binding InvoiceNumber, Mode=TwoWay}"/>
+                     Height="30" 
+                     VerticalContentAlignment="Center"
+                     Text="{Binding InvoiceNumber, Mode=TwoWay}"/>
             </StackPanel>
 
             <!-- project number textbox -->
             <StackPanel Grid.Column="3"
-                        Orientation="Horizontal"
-                        Margin="20,0">
-
+                    Orientation="Horizontal"
+                    Margin="20,0">
                 <TextBlock Text="Project #:" 
-                           VerticalAlignment="Center" 
-                           Margin="0,0,5,0"/>
-
+                       VerticalAlignment="Center" 
+                       Margin="0,0,5,0"/>
                 <TextBox Width="100"
-                         Height="30" 
-                         VerticalContentAlignment="Center"
-                         Text="{Binding ProjectNumber, Mode=TwoWay}"/>
+                     Height="30" 
+                     VerticalContentAlignment="Center"
+                     Text="{Binding ProjectNumber, Mode=TwoWay}"/>
             </StackPanel>
         </Grid>
 
         <!-- row 1: billing row -->
-        <StackPanel Grid.Row="1"
-                    Orientation="Horizontal"
-                    Margin="20,0">
-
-            <TextBlock Text="Bill:" 
-                       VerticalAlignment="Center" 
-                       Margin="0,0,5,0"/>
-
+        <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="20,0">
+            <TextBlock Text="Bill:" VerticalAlignment="Center" Margin="0,0,5,0"/>
             <!-- textbox for the name of who to bill -->
             <TextBox Width="300"
-                     Height="30" 
-                     VerticalContentAlignment="Center"
-                     Text="{Binding BillTo, Mode=TwoWay}"/>
+                 Height="30" 
+                 VerticalContentAlignment="Center"
+                 Text="{Binding BillTo, Mode=TwoWay}"/>
         </StackPanel>
 
-        <!-- row 2: invoice details area -->
-        <Grid Grid.Row="2"
-              Margin="20">
+        <!-- row 2: invoice details area using a datagrid -->
+        <Grid Grid.Row="2" Margin="20">
+            
+            <DataGrid ItemsSource="{Binding InvoiceItems}"
+                      AutoGenerateColumns="False"
+                      CanUserAddRows="False"
+                      CanUserDeleteRows="False"
+                      CanUserSortColumns="False"
+                      HeadersVisibility="Column"
+                      GridLinesVisibility="All"
+                      IsReadOnly="False"
+                      VerticalAlignment="Stretch"
+                      VerticalGridLinesBrush="DarkGray"
+                      HorizontalGridLinesBrush="LightGray"
+                      Background="WhiteSmoke">
 
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
+                <DataGrid.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem Header="Add Row"
+                                  Command="{Binding AddRowCommand}" />
 
-                <!-- column headers -->
-                <RowDefinition Height="*" />
-                <!-- invoice items area (scrollable if the length is too long) -->
-            </Grid.RowDefinitions>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="100" />
+                        <MenuItem Header="Remove Last Row"
+                                  Command="{Binding RemoveLastRowCommand}" />
 
-                <ColumnDefinition Width="*" />
+                    </ContextMenu>
+                </DataGrid.ContextMenu>
 
-                <ColumnDefinition Width="100" />
 
-                <ColumnDefinition Width="100" />
-            </Grid.ColumnDefinitions>
+                <DataGrid.Resources>
+                    <!-- style for multiline text display -->
+                    <Style x:Key="MultiLineTextBlockStyle" TargetType="TextBlock">
+                        <Setter Property="TextWrapping" Value="Wrap"/>
+                        <Setter Property="VerticalAlignment" Value="Top"/>
+                    </Style>
+                    <!-- style for multiline text editing -->
+                    <Style x:Key="MultiLineTextBoxStyle" TargetType="TextBox">
+                        <Setter Property="AcceptsReturn" Value="True"/>
+                        <Setter Property="TextWrapping" Value="Wrap"/>
+                        <Setter Property="VerticalContentAlignment" Value="Top"/>
+                    </Style>
+                </DataGrid.Resources>
 
-            <!-- column headers -->
-            <TextBlock Grid.Row="0"
-                       Grid.Column="0"
-                       Text="Quantity"
-                       HorizontalAlignment="Center"
-                       Margin="0,0,0,5"/>
+                <DataGrid.Columns>
+                    <!-- quantity -->
+                    <DataGridTextColumn Header="Quantity"
+                            Binding="{Binding Quantity, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, StringFormat=N0}"
+                            Width="100"/>
 
-            <TextBlock Grid.Row="0"
-                       Grid.Column="1"
-                       Text="Description"
-                       HorizontalAlignment="Center"
-                       Margin="0,0,0,5"/>
+                    <!-- description (multiline) -->
+                    <DataGridTextColumn Header="Description"
+                            Binding="{Binding Description, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                            Width="*"
+                            ElementStyle="{StaticResource MultiLineTextBlockStyle}"
+                            EditingElementStyle="{StaticResource MultiLineTextBoxStyle}"/>
 
-            <TextBlock Grid.Row="0"
-                       Grid.Column="2"
-                       Text="Rate"
-                       HorizontalAlignment="Left"
-                       Margin="18,0,0,5"/>
+                    <!-- rate -->
+                    <DataGridTextColumn Header="Rate"
+                            Binding="{Binding Rate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, StringFormat='{}${0:N2}'}"
+                            Width="100"/>
 
-            <TextBlock Grid.Row="0"
-                       Grid.Column="3"
-                       Text="Amount"
-                       HorizontalAlignment="Left"
-                       Margin="10,0,0,5"/>
-
-            <!-- invoice item placeholder -->
-            <ScrollViewer Grid.Row="1"
-                          Grid.ColumnSpan="4"
-                          VerticalScrollBarVisibility="Hidden">
-                <ItemsControl ItemsSource="{Binding InvoiceItems}">
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate>
-                            <Grid Margin="2">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="100" />
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="100" />
-                                    <ColumnDefinition Width="100" />
-                                </Grid.ColumnDefinitions>
-                                <!-- quantity textbox -->
-                                <TextBox Grid.Column="0"
-                                         Height="530"
-                                         Margin="5"
-                                         AcceptsReturn="True"
-                                         TextWrapping="Wrap"
-                                         PreviewTextInput="NumericOnly_PreviewTextInput"
-                                         DataObject.Pasting="NumericOnly_Pasting"
-                                         Text="{Binding QuantityText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-                                <!-- description textbox -->
-                                <TextBox Grid.Column="1"
-                                         Margin="5"
-                                         Height="530"
-                                         AcceptsReturn="True"
-                                         TextWrapping="Wrap"
-                                         Text="{Binding Description, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-                                <!-- rate textbox -->
-                                <TextBox Grid.Column="2"
-                                         Margin="5"
-                                         Height="530"
-                                         AcceptsReturn="True"
-                                         TextWrapping="Wrap"
-                                         Text="{Binding RateText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-                                <!--- amount textblock -->
-                                <TextBlock Grid.Column="3"
-                                           Margin="5"
-                                           Height="530"
-                                           Text="{Binding Amount, Mode=OneWay, StringFormat='{}{0:N2}'}"
-                                           Background="White"
-                                           Padding="5"/>
-                            </Grid>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
-            </ScrollViewer>
+                    <!-- amount (readonly) -->
+                    <DataGridTextColumn Header="Amount"
+                            Binding="{Binding Amount, Mode=OneWay, StringFormat='{}${0:N2}'}"
+                            Width="100"
+                            IsReadOnly="True"/>
+                </DataGrid.Columns>
+            </DataGrid>
         </Grid>
 
-        <!-- row 3: footer -->
-        <Grid Grid.Row="3"
-              Margin="15">
 
+        <!-- row 3: footer -->
+        <Grid Grid.Row="3" Margin="15">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
-
             <!-- preview print button -->
             <Button Grid.Column="0"
-                    Content="Preview Print"
-                    HorizontalAlignment="Center"
-                    Margin="300,0,0,0"
-                    Width="150"
-                    Height="35"
-                    Command="{Binding PreviewPrintCommand}"/>
-
+                Content="Preview Print"
+                HorizontalAlignment="Center"
+                Margin="300,0,0,0"
+                Width="150"
+                Height="35"
+                Command="{Binding PreviewPrintCommand}"/>
             <Button Grid.Column="0"
-                    Content="Load Previous Invoices"
-                    HorizontalAlignment="Center"
-                    Margin="0,0,300,0"
-                    Width="190"
-                    Command="{Binding LoadPreviousInvoicesCommand}"/>
-
+                Content="Load Previous Invoices"
+                HorizontalAlignment="Center"
+                Margin="0,0,300,0"
+                Width="190"
+                Command="{Binding LoadPreviousInvoicesCommand}"/>
             <!-- total display -->
             <StackPanel Grid.Column="1"
-                        Margin="0,0,20,0"
-                        Orientation="Horizontal"
-                        HorizontalAlignment="Right">
-
-                <TextBlock Text="Total:" 
-                           VerticalAlignment="Center"
-                           Margin="0,0,5,0"/>
-
-                <TextBlock Text="{Binding Total, StringFormat='{}${0:N2}'}"
-                           VerticalAlignment="Center"/>
+                    Margin="0,0,20,0"
+                    Orientation="Horizontal"
+                    HorizontalAlignment="Right">
+                <TextBlock Text="Total:" VerticalAlignment="Center" Margin="0,0,5,0"/>
+                <TextBlock Text="{Binding Total, StringFormat='{}${0:N2}'}" VerticalAlignment="Center"/>
             </StackPanel>
         </Grid>
     </Grid>

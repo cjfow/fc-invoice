@@ -1,55 +1,62 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using System;
+using System.ComponentModel;
 
-namespace FCInvoiceUI.Models
+namespace FCInvoiceUI.Models;
+
+public class InvoiceItem : INotifyPropertyChanged
 {
-    /// <summary>
-    /// Represents a single line item in an invoice.
-    /// </summary>
-    public partial class InvoiceItem : ObservableObject
+    private ushort? _quantity;
+
+    public ushort? Quantity
     {
-        // we use int? for quantity for simplicity—this means quantity is nullable.
-        private int? _quantity;
-        public int? Quantity
+        get => _quantity;
+        set
         {
-            get => _quantity;
-            set
-            {
-                if (SetProperty(ref _quantity, value))
-                {
-                    OnPropertyChanged(nameof(Amount));
-                }
-            }
-        }
-
-        private decimal? _rate;
-        public decimal? Rate
-        {
-            get => _rate;
-            set
-            {
-                if (SetProperty(ref _rate, value))
-                {
-                    OnPropertyChanged(nameof(Amount));
-                }
-            }
-        }
-
-        private string? _description;
-        public string? Description
-        {
-            get => _description;
-            set => SetProperty(ref _description, value);
-        }
-
-        public decimal Amount
-        {
-            get
-            {
-                // if Quantity is null but Rate exists, assume quantity 1,
-                // otherwise if both are null, use 0
-                int effectiveQuantity = Quantity ?? (Rate.HasValue ? 1 : 0);
-                return effectiveQuantity * (Rate ?? 0m);
-            }
+            if (_quantity == value) return;
+            _quantity = value;
+            OnPropertyChanged(nameof(Quantity));
+            OnPropertyChanged(nameof(Amount));
         }
     }
+
+    private string? _description;
+
+    public string? Description
+    {
+        get => _description;
+        set
+        {
+            if (_description == value) return;
+            _description = value;
+            OnPropertyChanged(nameof(Description));
+        }
+    }
+
+    private decimal? _rate;
+
+    public decimal? Rate
+    {
+        get => _rate;
+        set
+        {
+            if (_rate == value) return;
+            _rate = value;
+            OnPropertyChanged(nameof(Rate));
+            OnPropertyChanged(nameof(Amount));
+        }
+    }
+
+
+    public decimal Amount
+    {
+        get
+        {
+            var q = Quantity ?? (Rate.HasValue ? (ushort)1 : (ushort)0);
+            return q * (Rate ?? 0m);
+        }
+    }
+
+    public event PropertyChangedEventHandler? PropertyChanged;
+    private void OnPropertyChanged(string propName)
+        => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propName));
 }
