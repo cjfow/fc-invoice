@@ -29,13 +29,17 @@ public partial class MainViewModel : ObservableObject
             if (e.NewItems != null)
             {
                 foreach (InvoiceItem item in e.NewItems)
+                {
                     item.PropertyChanged += InvoiceItem_PropertyChanged;
+                }
             }
 
             if (e.OldItems != null)
             {
                 foreach (InvoiceItem item in e.OldItems)
+                {
                     item.PropertyChanged -= InvoiceItem_PropertyChanged;
+                }
             }
         };
     }
@@ -102,7 +106,9 @@ public partial class MainViewModel : ObservableObject
     private void InvoiceItem_PropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         if (e.PropertyName == nameof(InvoiceItem.Amount))
+        {
             OnPropertyChanged(nameof(Total));
+        }
     }
 
     [RelayCommand]

@@ -84,13 +84,17 @@ public class BillingInvoice : INotifyPropertyChanged
             if (e.NewItems != null)
             {
                 foreach (InvoiceItem item in e.NewItems)
+                {
                     item.PropertyChanged += OnItemChanged;
+                }
             }
 
             if (e.OldItems != null)
             {
                 foreach (InvoiceItem item in e.OldItems)
+                {
                     item.PropertyChanged -= OnItemChanged;
+                }
             }
 
             OnPropertyChanged(nameof(Total));
