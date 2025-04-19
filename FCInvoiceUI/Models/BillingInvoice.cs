@@ -26,8 +26,8 @@ public class BillingInvoice : INotifyPropertyChanged
         }
     }
 
-    private uint _invoiceNumber;
-    public uint InvoiceNumber
+    private string? _invoiceNumber;
+    public string? InvoiceNumber
     {
         get => _invoiceNumber;
         set
@@ -40,7 +40,7 @@ public class BillingInvoice : INotifyPropertyChanged
         }
     }
 
-    private string? _projectNumber;
+    private string? _projectNumber = $"{DateTime.Today:yy}-";
     public string? ProjectNumber
     {
         get => _projectNumber;
@@ -54,7 +54,7 @@ public class BillingInvoice : INotifyPropertyChanged
         }
     }
 
-    private string? _billTo;
+    private string? _billTo = "J.C. Concrete Inc.";
     public string? BillTo
     {
         get => _billTo;

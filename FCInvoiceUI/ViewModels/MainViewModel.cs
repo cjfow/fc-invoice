@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using FCInvoiceUI.Models;
+using FCInvoiceUI.Services;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 
@@ -10,7 +11,10 @@ public partial class MainViewModel : ObservableObject
 {
     public MainViewModel()
     {
-        Invoice = new BillingInvoice();
+        Invoice = new BillingInvoice
+        {
+            InvoiceNumber = InvoiceNumberGeneratorService.PeekNextInvoiceNumber()
+        };
 
         for (int i = 0; i < 5; i++)
         {
@@ -62,7 +66,7 @@ public partial class MainViewModel : ObservableObject
         }
     }
 
-    public uint InvoiceNumber
+    public string? InvoiceNumber
     {
         get => Invoice.InvoiceNumber;
         set
@@ -87,6 +91,7 @@ public partial class MainViewModel : ObservableObject
             }
         }
     }
+
 
     public string? BillTo
     {

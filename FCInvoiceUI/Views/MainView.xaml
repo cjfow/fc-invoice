@@ -110,7 +110,7 @@
                 <TextBox Width="100"
                      Height="30" 
                      VerticalContentAlignment="Center"
-                     Text="{Binding ProjectNumber, Mode=TwoWay}"/>
+                     Text="{Binding ProjectNumber, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
             </StackPanel>
         </Grid>
 
