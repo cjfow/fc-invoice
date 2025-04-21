@@ -4,179 +4,156 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:FCInvoiceUI.Views"
-        xmlns:sys="clr-namespace:System;assembly=mscorlib" xmlns:models="clr-namespace:FCInvoiceUI.Models" xmlns:viewmodels="clr-namespace:FCInvoiceUI.ViewModels" d:DataContext="{d:DesignInstance Type=viewmodels:PrintViewModel}"
+        xmlns:sys="clr-namespace:System;assembly=mscorlib"
+        xmlns:models="clr-namespace:FCInvoiceUI.Models"
+        xmlns:viewmodels="clr-namespace:FCInvoiceUI.ViewModels"
+        d:DataContext="{d:DesignInstance Type=viewmodels:PrintViewModel}"
         mc:Ignorable="d"
         Title="Invoice Print Preview"
-        Width="700"
-        Height="950"
-        MinHeight="850"
-        MinWidth="650"
+        Width="950"
+        Height="1040"
+        ResizeMode="NoResize"
         Background="#FFEFEFEF"
         WindowStartupLocation="CenterScreen">
 
+    <Window.Resources>
+        <Style TargetType="TextBlock">
+            <Setter Property="FontSize" Value="8.5" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="TextAlignment" Value="Center" />
+        </Style>
+    </Window.Resources>
+
     <Grid>
-        <!-- background preview area to simulate printed page -->
         <StackPanel HorizontalAlignment="Center"
                     VerticalAlignment="Top"
-                    Margin="0,20,0,80">
+                    Margin="0,20,0,20">
 
             <Border x:Name="PaperVisual"
                     Background="White"
                     BorderBrush="DarkGray"
                     BorderThickness="1"
-                    Width="612"
-                    Height="792">
+                    Width="768"
+                    Height="960">
 
-                <!-- set to a standard page at 72 DPI -->
-                <ScrollViewer VerticalScrollBarVisibility="Auto">
-                    <!-- printable content -->
-                    <Grid Margin="40">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="*" />
-                            <RowDefinition Height="Auto" />
-                        </Grid.RowDefinitions>
+                <Grid Margin="40">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="700" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
 
-                        <!-- header -->
-                        <TextBlock Grid.Row="0"
-                                   Text="I N V O I C E"
-                                   FontSize="24"
-                                   FontWeight="Bold"
-                                   TextAlignment="Center"
-                                   HorizontalAlignment="Center"
-                                   Margin="0,0,0,10" />
+                    <TextBlock Grid.Row="0"
+                               Text="I N V O I C E"
+                               FontSize="18"
+                               FontWeight="Bold"
+                               TextAlignment="Center"
+                               HorizontalAlignment="Center"
+                               Margin="0,0,0,10" />
 
-                        <!-- company info -->
-                        <StackPanel Grid.Row="1"
-                                    Margin="0,0,0,10">
-                            <TextBlock Text="Gene Fowler Const. Inc" />
-                            <TextBlock Text="304 E. Hinchman Rd" />
-                            <TextBlock Text="Berrien Springs Mi. 49103" />
+                    <StackPanel Grid.Row="1" Margin="0,0,0,10">
+                        <TextBlock Text="Gene Fowler Const. Inc" />
+                        <TextBlock Text="304 E. Hinchman Rd" />
+                        <TextBlock Text="Berrien Springs Mi. 49103" />
+                    </StackPanel>
+
+                    <Grid Grid.Row="2" Margin="0,0,0,10">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="3*" />
+                            <ColumnDefinition Width="2*" />
+                        </Grid.ColumnDefinitions>
+
+                        <StackPanel Grid.Column="0">
+                            <TextBlock Text="Bill:" FontWeight="Bold" />
+                            <TextBlock Text="{Binding BillTo}" />
+                            <TextBlock Text="Terms: Due on Receipt" FontWeight="Bold" Margin="0,20,0,0" />
                         </StackPanel>
 
-                        <!-- bill to and invoice info -->
-                        <Grid Grid.Row="2"
-                              Margin="0,0,0,10">
+                        <Grid Grid.Column="1" Margin="10,0,0,0">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="10" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="10" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="3*" />
-                                <ColumnDefinition Width="2*" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="150" />
                             </Grid.ColumnDefinitions>
 
-                            <!-- bill to section -->
-                            <StackPanel Grid.Column="0">
-                                <TextBlock Text="Bill:"
-                                           FontWeight="Bold" />
-                                <TextBlock Text="{Binding BillTo}" />
-                                <TextBlock Text="Terms: Due on Receipt"
-                                           FontWeight="Bold"
-                                           Margin="0,20,0,0" />
-                            </StackPanel>
+                            <TextBlock Grid.Row="0" Grid.Column="0" Text="Date:" FontWeight="Bold" Margin="0,0,5,0" />
+                            <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding SelectedDate, StringFormat='{}{0:dd MMM yy}'}" />
 
-                            <!-- date invoice and project info -->
-                            <Grid Grid.Column="1"
-                                  Margin="10,0,0,0">
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="Auto" />
-                                    <RowDefinition Height="10" />
-                                    <RowDefinition Height="Auto" />
-                                    <RowDefinition Height="10" />
-                                    <RowDefinition Height="Auto" />
-                                </Grid.RowDefinitions>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto" />
-                                    <ColumnDefinition Width="150" />
-                                </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Row="2" Grid.Column="0" Text="Invoice:" FontWeight="Bold" Margin="0,0,5,0" />
+                            <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding InvoiceNumber}" />
 
-                                <TextBlock Grid.Row="0"
-                                           Grid.Column="0"
-                                           Text="Date:"
-                                           FontWeight="Bold"
-                                           Margin="0,0,5,0"
-                                           VerticalAlignment="Center" />
-                                <TextBlock Grid.Row="0"
-                                           Grid.Column="1"
-                                           Text="{Binding SelectedDate, StringFormat='{}{0:dd MMM yy}'}" />
-
-                                <TextBlock Grid.Row="2"
-                                           Grid.Column="0"
-                                           Text="Invoice:"
-                                           FontWeight="Bold"
-                                           Margin="0,0,5,0"
-                                           VerticalAlignment="Center" />
-                                <TextBlock Grid.Row="2"
-                                           Grid.Column="1"
-                                           Text="{Binding InvoiceNumber}" />
-
-                                <TextBlock Grid.Row="4"
-                                           Grid.Column="0"
-                                           Text="Project:"
-                                           FontWeight="Bold"
-                                           Margin="0,0,5,0"
-                                           VerticalAlignment="Center" />
-                                <TextBlock Grid.Row="4"
-                                           Grid.Column="1"
-                                           Text="{Binding ProjectNumber}" />
-                            </Grid>
+                            <TextBlock Grid.Row="4" Grid.Column="0" Text="Project:" FontWeight="Bold" Margin="0,0,5,0" />
+                            <TextBlock Grid.Row="4" Grid.Column="1" Text="{Binding ProjectNumber}" />
                         </Grid>
+                    </Grid>
 
-                        <!-- table and items -->
-                        <Border Grid.Row="3"
-                                BorderBrush="Black"
-                                BorderThickness="1"
-                                Margin="0,5,0,2">
+                    <Border Grid.Row="3" BorderBrush="Black" BorderThickness="1" Margin="0,5,0,2">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
 
-                            <StackPanel>
-                                <!-- table header row -->
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="80" />
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="90" />
-                                        <ColumnDefinition Width="90" />
-                                    </Grid.ColumnDefinitions>
+                            <Grid Grid.Row="0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="60" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="70" />
+                                    <ColumnDefinition Width="80" />
+                                </Grid.ColumnDefinitions>
+                                <Border BorderBrush="Black" BorderThickness="0,0,1,1" Grid.Column="0">
+                                    <TextBlock Text="Quantity" FontWeight="Bold" Padding="5" />
+                                </Border>
+                                <Border BorderBrush="Black" BorderThickness="0,0,1,1" Grid.Column="1">
+                                    <TextBlock Text="Description" FontWeight="Bold" Padding="5" />
+                                </Border>
+                                <Border BorderBrush="Black" BorderThickness="0,0,1,1" Grid.Column="2">
+                                    <TextBlock Text="Rate" FontWeight="Bold" Padding="5" />
+                                </Border>
+                                <Border BorderBrush="Black" BorderThickness="0,0,0,1" Grid.Column="3">
+                                    <TextBlock Text="Amount" FontWeight="Bold" Padding="5" />
+                                </Border>
+                            </Grid>
 
-                                    <TextBlock Grid.Column="0" Text="Quantity" Padding="5" FontWeight="Bold" />
-                                    <TextBlock Grid.Column="1" Text="Description" Padding="5" FontWeight="Bold" />
-                                    <TextBlock Grid.Column="2" Text="Rate" Padding="5" FontWeight="Bold" />
-                                    <TextBlock Grid.Column="3" Text="Amount" Padding="5" FontWeight="Bold" />
-                                </Grid>
+                            <ItemsControl Grid.Row="1" ItemsSource="{Binding InvoiceItems}">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <StackPanel />
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="60" />
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="70" />
+                                                <ColumnDefinition Width="80" />
+                                            </Grid.ColumnDefinitions>
 
-                                <!-- invoice line items -->
-                                <ItemsControl ItemsSource="{Binding InvoiceItems}">
-                                    <ItemsControl.ItemTemplate>
-                                        <DataTemplate>
-                                            <Grid>
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="80" />
-                                                    <ColumnDefinition Width="*" />
-                                                    <ColumnDefinition Width="90" />
-                                                    <ColumnDefinition Width="90" />
-                                                </Grid.ColumnDefinitions>
-
-                                                <TextBlock Grid.Column="0"
-                                                           Text="{Binding Quantity}"
-                                                           Padding="5"
-                                                           VerticalAlignment="Center" />
-
-                                                <TextBlock Grid.Column="1"
-                                                           Text="{Binding Description}"
-                                                           Padding="5"
-                                                           TextWrapping="Wrap"
-                                                           VerticalAlignment="Center" />
-
-                                                <TextBlock Grid.Column="2"
-                                                           VerticalAlignment="Center">
+                                            <Border BorderBrush="Black" BorderThickness="0,0,1,1" Grid.Column="0">
+                                                <TextBlock Text="{Binding Quantity}" Padding="5" FontSize="8.5" />
+                                            </Border>
+                                            <Border BorderBrush="Black" BorderThickness="0,0,1,1" Grid.Column="1">
+                                                <TextBlock Text="{Binding Description}" Padding="5" TextWrapping="Wrap" FontSize="8.5" />
+                                            </Border>
+                                            <Border BorderBrush="Black" BorderThickness="0,0,1,1" Grid.Column="2">
+                                                <TextBlock Padding="5" FontSize="8.5">
                                                     <TextBlock.Style>
                                                         <Style TargetType="TextBlock">
                                                             <Setter Property="Text" Value="{Binding Rate, StringFormat={}${0:N2}}" />
                                                             <Style.Triggers>
-                                                                <!-- trigger for zero value -->
                                                                 <DataTrigger Binding="{Binding Rate}" Value="0">
                                                                     <Setter Property="Text" Value="" />
                                                                 </DataTrigger>
-                                                                <!-- trigger for null or empty value -->
                                                                 <DataTrigger Binding="{Binding Rate, TargetNullValue=''}" Value="">
                                                                     <Setter Property="Text" Value="" />
                                                                 </DataTrigger>
@@ -184,13 +161,12 @@
                                                         </Style>
                                                     </TextBlock.Style>
                                                 </TextBlock>
-
-                                                <TextBlock Grid.Column="3"
-                                                           VerticalAlignment="Center">
+                                            </Border>
+                                            <Border BorderBrush="Black" BorderThickness="0,0,0,1" Grid.Column="3">
+                                                <TextBlock Padding="5" FontSize="8.5">
                                                     <TextBlock.Style>
                                                         <Style TargetType="TextBlock">
-                                                            <Setter Property="Text"
-                                                                    Value="{Binding Amount, StringFormat={}${0:N2}}" />
+                                                            <Setter Property="Text" Value="{Binding Amount, StringFormat={}${0:N2}}" />
                                                             <Style.Triggers>
                                                                 <DataTrigger Binding="{Binding Amount}" Value="0">
                                                                     <Setter Property="Text" Value="" />
@@ -199,49 +175,35 @@
                                                         </Style>
                                                     </TextBlock.Style>
                                                 </TextBlock>
-                                            </Grid>
-                                        </DataTemplate>
-                                    </ItemsControl.ItemTemplate>
-                                </ItemsControl>
+                                            </Border>
+                                        </Grid>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </Grid>
+                    </Border>
+
+                    <DockPanel Grid.Row="4" LastChildFill="False" Margin="0,20,0,0" VerticalAlignment="Bottom">
+                        <TextBlock Text="Thank you for your business."
+                                   FontStyle="Italic"
+                                   DockPanel.Dock="Left"
+                                   Margin="0,0,0,10" />
+
+                        <StackPanel HorizontalAlignment="Right" Orientation="Vertical" DockPanel.Dock="Right">
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                <TextBlock Text="Total: " FontWeight="Bold" Margin="0,0,5,0" />
+                                <TextBlock Text="{Binding Total, StringFormat={}${0:N2}}" />
                             </StackPanel>
-                        </Border>
-
-                        <!-- footer -->
-                        <DockPanel Grid.Row="4"
-                                   LastChildFill="True"
-                                   Margin="0,20,0,0"
-                                   VerticalAlignment="Bottom">
-
-                            <TextBlock Text="Thank you for your business."
-                                       FontStyle="Italic"
-                                       DockPanel.Dock="Left"
-                                       Margin="0,0,0,10" />
-
-                            <StackPanel HorizontalAlignment="Right"
-                                        DockPanel.Dock="Right">
-
-                                <TextBlock Text="Total:"
-                                           FontWeight="Bold"
-                                           TextAlignment="Right" />
-
-                                <TextBlock d:DataContext="{d:DesignInstance Type=viewmodels:MainViewModel}" Text="{Binding Total, StringFormat={}${0:N2}}"
-                                           TextAlignment="Right"/>
-
-                                <TextBlock Text="Balance Due:"
-                                           FontWeight="Bold"
-                                           TextAlignment="Right"
-                                           Margin="0,5,0,0"/>
-
-                                <TextBlock d:DataContext="{d:DesignInstance Type=viewmodels:MainViewModel}" Text="{Binding Total, StringFormat={}${0:N2}}"
-                                           TextAlignment="Right"/>
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,5,0,0">
+                                <TextBlock Text="Balance Due: " FontWeight="Bold" Margin="0,0,5,0" />
+                                <TextBlock Text="{Binding Total, StringFormat={}${0:N2}}" />
                             </StackPanel>
-                        </DockPanel>
-                    </Grid>
-                </ScrollViewer>
+                        </StackPanel>
+                    </DockPanel>
+                </Grid>
             </Border>
         </StackPanel>
 
-        <!-- print and save button -->
         <Button Content="Print and Save"
                 Width="160"
                 Height="40"
@@ -249,6 +211,6 @@
                 VerticalAlignment="Bottom"
                 Margin="0,0,0,30"
                 FontWeight="Bold"
-                Command="{Binding PrintAndSaveCommand}"/>
+                Command="{Binding PrintAndSaveCommand}" />
     </Grid>
 </Window>

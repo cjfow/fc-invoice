@@ -11,6 +11,9 @@ namespace FCInvoiceUI.ViewModels;
 
 public partial class PrintViewModel(BillingInvoice invoice) : ObservableObject
 {
+    // test anon method:
+    // public string TestText => "Binding works!";
+
     public string? BillTo { get; } = invoice.BillTo;
     public string? ProjectNumber { get; } = invoice.ProjectNumber;
     public string? InvoiceNumber { get; } = invoice.InvoiceNumber;
@@ -21,34 +24,64 @@ public partial class PrintViewModel(BillingInvoice invoice) : ObservableObject
     [RelayCommand]
     public async Task PrintAndSaveAsync()
     {
+        MessageBox.Show("Command reached.");
         foreach (Window window in Application.Current.Windows)
         {
-            if (window.Title != "Invoice Print Preview")
+            if (!window.Title.Contains("Invoice"))
                 continue;
 
             if (window.FindName("PaperVisual") is not FrameworkElement element)
+            {
+                MessageBox.Show("PaperVisual not found.");
                 return;
+            }
 
             var printDialog = new PrintDialog();
             if (printDialog.ShowDialog() != true)
+            {
+                MessageBox.Show("Print canceled.");
                 break;
+            }
 
-            var capabilities = printDialog.PrintQueue.GetPrintCapabilities(printDialog.PrintTicket);
+            try
+            {
+                var capabilities = printDialog.PrintQueue.GetPrintCapabilities(printDialog.PrintTicket);
+                var printableWidth = capabilities.PageImageableArea.ExtentWidth;
+                var printableHeight = capabilities.PageImageableArea.ExtentHeight;
 
-            double scale = Math.Min(
-                capabilities.PageImageableArea.ExtentWidth / element.ActualWidth,
-                capabilities.PageImageableArea.ExtentHeight / element.ActualHeight);
+                // force layout and get desired size
+                element.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
+                element.Arrange(new Rect(new Point(0, 0), element.DesiredSize));
+                element.UpdateLayout();
 
-            var originalTransform = element.LayoutTransform;
-            element.LayoutTransform = new ScaleTransform(scale, scale);
+                // calculate scale
+                double scale = Math.Min(
+                    printableWidth / element.DesiredSize.Width,
+                    printableHeight / element.DesiredSize.Height);
 
-            var size = new Size(element.ActualWidth, element.ActualHeight);
-            element.Measure(size);
-            element.Arrange(new Rect(new Point(0, 0), size));
+                // apply scale
+                var originalTransform = element.LayoutTransform;
+                element.LayoutTransform = new ScaleTransform(scale, scale);
 
-            printDialog.PrintVisual(element, "Invoice Print");
+                var scaledSize = new Size(element.DesiredSize.Width * scale, element.DesiredSize.Height * scale);
+                element.Measure(scaledSize);
+                element.Arrange(new Rect(new Point(0, 0), scaledSize));
+                element.UpdateLayout();
 
-            element.LayoutTransform = originalTransform;
+                await Application.Current.Dispatcher.InvokeAsync(() =>
+                {
+                    printDialog.PrintVisual(element, "Invoice Print");
+                });
+
+                element.LayoutTransform = originalTransform;
+
+                MessageBox.Show($"Printing to: {printDialog.PrintQueue.Name}");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Printing failed: {ex.Message}");
+            }
+
             break;
         }
 
@@ -57,6 +90,7 @@ public partial class PrintViewModel(BillingInvoice invoice) : ObservableObject
         {
             var jsonService = new JsonInvoiceStorageService();
             await jsonService.SaveInvoiceAsync(invoice);
+            MessageBox.Show("Save complete!");
         }
         catch (Exception ex)
         {

@@ -93,7 +93,6 @@ public partial class MainViewModel : ObservableObject
         }
     }
 
-
     public string? BillTo
     {
         get => Invoice.BillTo;
@@ -120,13 +119,10 @@ public partial class MainViewModel : ObservableObject
     [RelayCommand]
     private void OpenPrintPreview()
     {
-        var previewWindow = new PrintView(Invoice)
-        {
-            DataContext = this
-        };
-
+        var previewWindow = new PrintView(Invoice);
         previewWindow.ShowDialog();
     }
+
 
 
     [RelayCommand]
