@@ -1,27 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using FCInvoiceUI.Models;
+using FCInvoiceUI.ViewModels;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 
-namespace FCInvoiceUI.Views
+namespace FCInvoiceUI.Views;
+
+/// <summary>
+/// Interaction logic for PrintView.xaml
+/// </summary>
+public partial class PrintView : Window
 {
-    /// <summary>
-    /// Interaction logic for PrintView.xaml
-    /// </summary>
-    public partial class PrintView : Window
+    public PrintView(BillingInvoice invoice)
     {
-        public PrintView()
-        {
-            InitializeComponent();
-        }
+        InitializeComponent();
+        DataContext = new PrintViewModel(invoice);
     }
 }

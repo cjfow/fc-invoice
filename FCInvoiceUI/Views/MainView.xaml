@@ -202,12 +202,13 @@
             </Grid.ColumnDefinitions>
             <!-- preview print button -->
             <Button Grid.Column="0"
-                Content="Preview Print"
-                HorizontalAlignment="Center"
-                Margin="300,0,0,0"
-                Width="150"
-                Height="35"
-                Command="{Binding PreviewPrintCommand}"/>
+                    Content="Print Preview"
+                    HorizontalAlignment="Center"
+                    Margin="300,0,0,0"
+                    Width="150"
+                    Height="35"
+                    Command="{Binding OpenPrintPreviewCommand}" />
+
             <Button Grid.Column="0"
                 Content="Load Previous Invoices"
                 HorizontalAlignment="Center"

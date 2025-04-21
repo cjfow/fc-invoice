@@ -2,6 +2,7 @@
 using CommunityToolkit.Mvvm.Input;
 using FCInvoiceUI.Models;
 using FCInvoiceUI.Services;
+using FCInvoiceUI.Views;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 
@@ -16,7 +17,7 @@ public partial class MainViewModel : ObservableObject
             InvoiceNumber = InvoiceNumberGeneratorService.PeekNextInvoiceNumber()
         };
 
-        for (int i = 0; i < 5; i++)
+        for (int i = 0; i < 10; i++)
         {
             Invoice.Items.Add(new InvoiceItem());
         }
@@ -117,6 +118,18 @@ public partial class MainViewModel : ObservableObject
     }
 
     [RelayCommand]
+    private void OpenPrintPreview()
+    {
+        var previewWindow = new PrintView(Invoice)
+        {
+            DataContext = this
+        };
+
+        previewWindow.ShowDialog();
+    }
+
+
+    [RelayCommand]
     private void AddRow()
     {
         var newItem = new InvoiceItem();
@@ -133,17 +146,5 @@ public partial class MainViewModel : ObservableObject
             last.PropertyChanged -= InvoiceItem_PropertyChanged;
             Invoice.Items.RemoveAt(Invoice.Items.Count - 1);
         }
-    }
-
-    [RelayCommand]
-    private void PreviewPrint()
-    {
-        // TODO: Implement logic
-    }
-
-    [RelayCommand]
-    private void LoadPreviousInvoices()
-    {
-        // TODO: Implement logic
     }
 }
