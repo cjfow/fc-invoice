@@ -22,7 +22,9 @@
     <Grid>
         <!-- background gradient -->
         <Grid.Background>
-            <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+            <LinearGradientBrush StartPoint="0,0" 
+                                 EndPoint="1,1">
+                
                 <GradientStop Color="{StaticResource primaryBackColor}" Offset="0.0" />
                 <GradientStop Color="{StaticResource secondaryBackColor}" Offset="1.0" />
             </LinearGradientBrush>
