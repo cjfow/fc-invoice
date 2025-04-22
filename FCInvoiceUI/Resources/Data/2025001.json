@@ -5,10 +5,10 @@
   "BillTo": "J.C. Concrete Inc.",
   "Items": [
     {
-      "Quantity": null,
+      "Quantity": 12,
       "Description": null,
-      "Rate": null,
-      "Amount": 0
+      "Rate": 23.00,
+      "Amount": 276.00
     },
     {
       "Quantity": null,
@@ -65,5 +65,5 @@
       "Amount": 0
     }
   ],
-  "Total": 0
+  "Total": 276.00
 }
