@@ -57,6 +57,8 @@ public class InvoiceItem : INotifyPropertyChanged
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;
+
+    // notifies ui that a property is changed (if not null) so it can update
     private void OnPropertyChanged(string propName)
         => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propName));
 }

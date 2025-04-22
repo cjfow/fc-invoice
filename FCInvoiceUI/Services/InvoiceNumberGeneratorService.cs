@@ -22,7 +22,7 @@ class InvoiceNumberGeneratorService
         if (File.Exists(filePath))
         {
             var content = File.ReadAllText(filePath);
-            (fileYear, lastUsed) = ParseInvoiceData(content);
+            (fileYear, lastUsed) = FormatInvoiceNumber(content);
         }
         else
         {
@@ -46,7 +46,7 @@ class InvoiceNumberGeneratorService
         if (File.Exists(filePath))
         {
             var content = File.ReadAllText(filePath);
-            (fileYear, lastUsed) = ParseInvoiceData(content);
+            (fileYear, lastUsed) = FormatInvoiceNumber(content);
         }
         else
         {
@@ -70,10 +70,12 @@ class InvoiceNumberGeneratorService
         // TODO: Call this method when invoice is printed or saved
     }
 
-    private static (int year, int count) ParseInvoiceData(string input)
+    private static (int year, int count) FormatInvoiceNumber(string input)
     {
         try
         {
+            // splits the string into 2 parts, YYYY-XXX,
+            // where y is the year, and x is an incrimenting counter starting at 001
             (string yearStr, string countStr) = input.Split('-') switch
             {
                 [var y, var c] => (y, c),

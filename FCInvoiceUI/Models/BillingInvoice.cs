@@ -1,15 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Collections.Specialized;
+﻿using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Linq;
 
 namespace FCInvoiceUI.Models;
 
-/// <summary>
-/// Represents a customer invoice with header information and a list of invoice items.
-/// </summary>
 public class BillingInvoice : INotifyPropertyChanged
 {
     private DateTime _selectedDate = DateTime.Today;

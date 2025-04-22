@@ -14,8 +14,6 @@ public partial class PrintView : Window
     {
         InitializeComponent();
         DataContext = new PrintViewModel(invoice);
-
-        // scale up preview (doesn't affect printed output)
     }
 }
 

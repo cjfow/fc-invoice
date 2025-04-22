@@ -6,11 +6,19 @@ namespace FCInvoiceUI.Services;
 
 public class JsonInvoiceStorageService : IInvoiceStorageService
 {
-    private readonly string _baseDirectory = @"C:\\Users\\cfowl\\source\\repos\\FCInvoice\\FCInvoiceUI\\Resources\\Data";
+    private readonly string _baseDirectory = @"C:\Users\cfowl\source\repos\FCInvoice\FCInvoiceUI\Resources\Data";
 
     public async Task SaveInvoiceAsync(BillingInvoice invoice)
     {
-        Directory.CreateDirectory(_baseDirectory);
+        if (string.IsNullOrWhiteSpace(invoice.InvoiceNumber))
+        {
+            ArgumentException argumentException = new("Invoice number must not be null or empty.", nameof(invoice));
+            throw argumentException;
+        }
+
+        if (!Directory.Exists(_baseDirectory))
+            Directory.CreateDirectory(_baseDirectory);
+
         string fileName = Path.Combine(_baseDirectory, $"{invoice.InvoiceNumber}.json");
 
         JsonSerializerOptions jsonSerializerOptions = new() { WriteIndented = true };
@@ -19,6 +27,7 @@ public class JsonInvoiceStorageService : IInvoiceStorageService
 
         await File.WriteAllTextAsync(fileName, json);
     }
+
 
     public async Task<BillingInvoice?> LoadInvoiceAsync(string invoiceNumber)
     {

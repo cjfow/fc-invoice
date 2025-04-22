@@ -24,7 +24,8 @@ public partial class PrintViewModel(BillingInvoice invoice) : ObservableObject
     [RelayCommand]
     public async Task PrintAndSaveAsync()
     {
-        MessageBox.Show("Command reached.");
+        // TESTING: MessageBox.Show("Command reached.");
+
         foreach (Window window in Application.Current.Windows)
         {
             if (!window.Title.Contains("Invoice"))
@@ -32,7 +33,7 @@ public partial class PrintViewModel(BillingInvoice invoice) : ObservableObject
 
             if (window.FindName("PaperVisual") is not FrameworkElement element)
             {
-                MessageBox.Show("PaperVisual not found.");
+                MessageBox.Show("Print preview not found :(");
                 return;
             }
 
@@ -43,23 +44,20 @@ public partial class PrintViewModel(BillingInvoice invoice) : ObservableObject
                 break;
             }
 
+            // attempt to print
             try
             {
                 var capabilities = printDialog.PrintQueue.GetPrintCapabilities(printDialog.PrintTicket);
                 var printableWidth = capabilities.PageImageableArea.ExtentWidth;
                 var printableHeight = capabilities.PageImageableArea.ExtentHeight;
 
-                // force layout and get desired size
                 element.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
                 element.Arrange(new Rect(new Point(0, 0), element.DesiredSize));
                 element.UpdateLayout();
 
-                // calculate scale
-                double scale = Math.Min(
-                    printableWidth / element.DesiredSize.Width,
+                double scale = Math.Min(printableWidth / element.DesiredSize.Width,
                     printableHeight / element.DesiredSize.Height);
 
-                // apply scale
                 var originalTransform = element.LayoutTransform;
                 element.LayoutTransform = new ScaleTransform(scale, scale);
 
@@ -85,7 +83,6 @@ public partial class PrintViewModel(BillingInvoice invoice) : ObservableObject
             break;
         }
 
-        // save the invoice after printing
         try
         {
             var jsonService = new JsonInvoiceStorageService();

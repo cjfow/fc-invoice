@@ -17,7 +17,7 @@ public partial class MainViewModel : ObservableObject
             InvoiceNumber = InvoiceNumberGeneratorService.PeekNextInvoiceNumber()
         };
 
-        for (int i = 0; i < 10; i++)
+        for (int i = 0; i < 2; i++)
         {
             Invoice.Items.Add(new InvoiceItem());
         }

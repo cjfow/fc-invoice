@@ -1,57 +1,9 @@
 {
-  "SelectedDate": "2025-04-21T00:00:00-04:00",
+  "SelectedDate": "2025-04-22T00:00:00-04:00",
   "InvoiceNumber": "2025001",
   "ProjectNumber": "25-",
   "BillTo": "J.C. Concrete Inc.",
   "Items": [
-    {
-      "Quantity": 12,
-      "Description": null,
-      "Rate": 23.00,
-      "Amount": 276.00
-    },
-    {
-      "Quantity": null,
-      "Description": null,
-      "Rate": null,
-      "Amount": 0
-    },
-    {
-      "Quantity": null,
-      "Description": null,
-      "Rate": null,
-      "Amount": 0
-    },
-    {
-      "Quantity": null,
-      "Description": null,
-      "Rate": null,
-      "Amount": 0
-    },
-    {
-      "Quantity": null,
-      "Description": null,
-      "Rate": null,
-      "Amount": 0
-    },
-    {
-      "Quantity": null,
-      "Description": null,
-      "Rate": null,
-      "Amount": 0
-    },
-    {
-      "Quantity": null,
-      "Description": null,
-      "Rate": null,
-      "Amount": 0
-    },
-    {
-      "Quantity": null,
-      "Description": null,
-      "Rate": null,
-      "Amount": 0
-    },
     {
       "Quantity": null,
       "Description": null,
@@ -65,5 +17,5 @@
       "Amount": 0
     }
   ],
-  "Total": 276.00
+  "Total": 0
 }
