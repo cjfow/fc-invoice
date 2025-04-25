@@ -14,10 +14,10 @@ public partial class MainViewModel : ObservableObject
     {
         Invoice = new BillingInvoice
         {
-            InvoiceNumber = InvoiceNumberGeneratorService.PeekNextInvoiceNumber()
+            InvoiceNumber = InvoiceNumberGeneratorService.GetNextInvoiceNumber()
         };
 
-        for (int i = 0; i < 2; i++)
+        for (int i = 0; i < 3; i++)
         {
             Invoice.Items.Add(new InvoiceItem());
         }

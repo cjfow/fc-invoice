@@ -1,92 +1,44 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace FCInvoiceUI.Services;
 
 class InvoiceNumberGeneratorService
 {
-    private const string filePath = @"C:\Users\cfowl\source\repos\FCInvoice\FCInvoiceUI\Resources\Data\invoice_number.txt";
+    private const string folderPath = @"C:\Users\cfowl\source\repos\FCInvoice\FCInvoiceUI\Resources\Data";
 
-    public static string PeekNextInvoiceNumber()
+    public static string GetNextInvoiceNumber()
     {
-        int year = DateTime.Today.Year;
-        int lastUsed = 0;
-        int fileYear;
+        int currentYear = DateTime.Today.Year;
 
-        var dir = Path.GetDirectoryName(filePath);
-        if (!Directory.Exists(dir) && !string.IsNullOrWhiteSpace(dir))
+        if (!Directory.Exists(folderPath))
         {
-            Directory.CreateDirectory(dir);
+            Directory.CreateDirectory(folderPath);
+            return $"{currentYear}001";
         }
 
-        if (File.Exists(filePath))
+        // get all the current files in the data folder, remove .json ext,
+        // make sure they fit the yyyyxxx format, select confirms elements are safe to deref, make them a list
+        var invoiceFiles = Directory.GetFiles(folderPath, "*.json")
+            .Select(Path.GetFileNameWithoutExtension)
+            .Where(name => name is string n && n.Length == 7 && n.StartsWith(currentYear.ToString()))
+            .Select(name => name!)
+            .ToList();
+
+        List<int> invoiceNumbers = [];
+
+        foreach (var name in invoiceFiles)
         {
-            var content = File.ReadAllText(filePath);
-            (fileYear, lastUsed) = FormatInvoiceNumber(content);
-        }
-        else
-        {
-            fileYear = year;
-        }
-
-        if (fileYear != year)
-        {
-            lastUsed = 0;
-        }
-
-        return $"{year}{(lastUsed + 1):D3}";
-    }
-
-    public static void ReserveNextInvoiceNumber()
-    {
-        int year = DateTime.Today.Year;
-        int lastUsed = 0;
-        int fileYear;
-
-        if (File.Exists(filePath))
-        {
-            var content = File.ReadAllText(filePath);
-            (fileYear, lastUsed) = FormatInvoiceNumber(content);
-        }
-        else
-        {
-            fileYear = year;
-        }
-
-        if (fileYear != year)
-        {
-            lastUsed = 0;
-        }
-
-        if (lastUsed >= 999)
-        {
-            throw new InvalidOperationException("Maximum number of invoices reached for the year.");
-        }
-
-        lastUsed++;
-
-        File.WriteAllText(filePath, $"{year}-{lastUsed}");
-
-        // TODO: Call this method when invoice is printed or saved
-    }
-
-    private static (int year, int count) FormatInvoiceNumber(string input)
-    {
-        try
-        {
-            // splits the string into 2 parts, YYYY-XXX,
-            // where y is the year, and x is an incrimenting counter starting at 001
-            (string yearStr, string countStr) = input.Split('-') switch
+            string numberPart = name[4..];
+            if (int.TryParse(numberPart, out int number))
             {
-                [var y, var c] => (y, c),
-                _ => ("0", "0")
-            };
+                invoiceNumbers.Add(number);
+            }
+        }
 
-            return (int.Parse(yearStr), int.Parse(countStr));
-        }
-        catch
-        {
-            return (DateTime.Today.Year, 0);
-        }
+        int nextNumber = (invoiceNumbers.Count != 0 ? invoiceNumbers.Max() : 0) + 1;
+        return $"{currentYear}{nextNumber:D3}";
     }
 }

@@ -19,7 +19,7 @@
     <Window.Resources>
         <Style TargetType="TextBlock">
             <Setter Property="FontSize"
-                    Value="12" />
+                    Value="18" />
             
             <Setter Property="VerticalAlignment"
                     Value="Center" />
@@ -48,23 +48,24 @@
                     <Grid Margin="40">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="40" />
-                            <RowDefinition Height="70" />
-                            <RowDefinition Height="100" />
-                            <RowDefinition Height="600" />
+                            <RowDefinition Height="90" />
+                            <RowDefinition Height="130" />
+                            <RowDefinition Height="610" />
                             <RowDefinition Height="Auto" />
                         </Grid.RowDefinitions>
 
                         <TextBlock Grid.Row="0"
                                     Text="I N V O I C E"
-                                    FontSize="18"
+                                    FontSize="22"
                                     FontWeight="Bold"
                                     TextAlignment="Center"
                                     HorizontalAlignment="Center"
                                     Margin="0,0,0,0" />
 
                         <StackPanel Grid.Row="1"
-                                    Margin="0,0,0,15"
-                                    HorizontalAlignment="Left">
+                                    Margin="3,10,0,0"
+                                    VerticalAlignment="Center"
+                                    HorizontalAlignment="Center">
 
                             <TextBlock Text="Gene Fowler Const. Inc"
                                        TextAlignment="Left"/>
@@ -99,11 +100,12 @@
                                            FontWeight="Bold"
                                            TextAlignment="Left"
                                            VerticalAlignment="Bottom"
-                                           Margin="0,49,0,0" />
+                                           Margin="0,55,0,0" />
                             </StackPanel>
 
                             <Grid Grid.Column="1"
-                                  Margin="0,0,0,0">
+                                  Margin="0,0,0,0"
+                                  HorizontalAlignment="Right">
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="Auto" />
                                     <RowDefinition Height="20" />
@@ -114,7 +116,7 @@
                                 </Grid.RowDefinitions>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="Auto" />
-                                    <ColumnDefinition Width="150" />
+                                    <ColumnDefinition Width="100" />
                                 </Grid.ColumnDefinitions>
 
                                 <TextBlock Grid.Row="0"
@@ -157,7 +159,7 @@
                         <Border Grid.Row="3"
                                 BorderBrush="Black"
                                 BorderThickness="1"
-                                Margin="0,5,0,5">
+                                Margin="0,20,0,0">
                             <Grid>
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="25" />
@@ -166,10 +168,10 @@
 
                                 <Grid Grid.Row="0">
                                     <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="70" />
+                                        <ColumnDefinition Width="90" />
                                         <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="70" />
-                                        <ColumnDefinition Width="70" />
+                                        <ColumnDefinition Width="90" />
+                                        <ColumnDefinition Width="90" />
                                     </Grid.ColumnDefinitions>
                                     <Border BorderBrush="Black"
                                             BorderThickness="0,0,1,1"
@@ -211,10 +213,10 @@
                                 <Grid Grid.Row="1">
                                     <Grid IsHitTestVisible="False">
                                         <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="70" />
+                                            <ColumnDefinition Width="90" />
                                             <ColumnDefinition Width="*" />
-                                            <ColumnDefinition Width="70" />
-                                            <ColumnDefinition Width="70" />
+                                            <ColumnDefinition Width="90" />
+                                            <ColumnDefinition Width="90" />
                                         </Grid.ColumnDefinitions>
 
                                         <Border BorderBrush="Black"
@@ -247,29 +249,29 @@
                                             <DataTemplate>
                                                 <Grid>
                                                     <Grid.ColumnDefinitions>
-                                                        <ColumnDefinition Width="70" />
+                                                        <ColumnDefinition Width="90" />
                                                         <ColumnDefinition Width="*" />
-                                                        <ColumnDefinition Width="70" />
-                                                        <ColumnDefinition Width="70" />
+                                                        <ColumnDefinition Width="90" />
+                                                        <ColumnDefinition Width="90" />
                                                     </Grid.ColumnDefinitions>
 
                                                     <TextBlock Grid.Column="0"
                                                                HorizontalAlignment="Center"
                                                                Text="{Binding Quantity}"
                                                                Padding="5"
-                                                               FontSize="12" />
+                                                               FontSize="18" />
 
                                                     <TextBlock Grid.Column="1"
                                                                HorizontalAlignment="Center"
                                                                Text="{Binding Description}"
                                                                Padding="5"
-                                                               FontSize="12"
+                                                               FontSize="18"
                                                                TextWrapping="Wrap" />
 
                                                     <TextBlock Grid.Column="2"
                                                                HorizontalAlignment="Center"
                                                                Padding="5"
-                                                               FontSize="11">
+                                                               FontSize="18">
                                                         <TextBlock.Style>
                                                             <Style TargetType="TextBlock">
                                                                 <Setter Property="Text"
@@ -288,11 +290,11 @@
                                                     <TextBlock Grid.Column="3"
                                                                Padding="5"
                                                                HorizontalAlignment="Center"
-                                                               FontSize="11">
+                                                               FontSize="18">
                                                         <TextBlock.Style>
                                                             <Style TargetType="TextBlock">
                                                                 <Setter Property="Text"
-                                                                        Value="{Binding Amount, StringFormat={}${0:N2}}" />
+                                                                        Value="{Binding Amount, StringFormat={}{0:N2}}" />
                                                                 <Style.Triggers>
                                                                     <DataTrigger Binding="{Binding Amount}"
                                                                                  Value="0">
@@ -312,8 +314,8 @@
                         </Border>
 
                         <DockPanel Grid.Row="4"
-                                   Margin="0,50,0,0"
-                                   Height="50"
+                                   Margin="0,20,0,0"
+                                   Height="80"
                                    VerticalAlignment="Bottom">
                             <TextBlock Text="Thank you for your business."
                                    HorizontalAlignment="Left"

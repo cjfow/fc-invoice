@@ -1,9 +1,21 @@
 {
-  "SelectedDate": "2025-04-22T00:00:00-04:00",
+  "SelectedDate": "2025-04-24T00:00:00-04:00",
   "InvoiceNumber": "2025001",
-  "ProjectNumber": "25-",
+  "ProjectNumber": "25-101",
   "BillTo": "J.C. Concrete Inc.",
   "Items": [
+    {
+      "Quantity": 123,
+      "Description": "Testing a longer sentence to make sure it fits",
+      "Rate": 2,
+      "Amount": 246
+    },
+    {
+      "Quantity": 1300,
+      "Description": "Concrete floor (crawl space)",
+      "Rate": 0.500,
+      "Amount": 650.000
+    },
     {
       "Quantity": null,
       "Description": null,
@@ -11,11 +23,11 @@
       "Amount": 0
     },
     {
-      "Quantity": null,
-      "Description": null,
-      "Rate": null,
-      "Amount": 0
+      "Quantity": 10000,
+      "Description": "Testing an extra space",
+      "Rate": 3.00,
+      "Amount": 30000.00
     }
   ],
-  "Total": 0
+  "Total": 30896.000
 }

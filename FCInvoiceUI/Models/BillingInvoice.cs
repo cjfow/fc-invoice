@@ -33,7 +33,7 @@ public class BillingInvoice : INotifyPropertyChanged
         }
     }
 
-    private string? _projectNumber = $"{DateTime.Today:yy}-";
+    private string? _projectNumber = $"{DateTime.Today:yy}-000";
     public string? ProjectNumber
     {
         get => _projectNumber;
