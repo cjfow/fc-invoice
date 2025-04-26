@@ -1,19 +1,16 @@
-﻿using System.Collections.ObjectModel;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Media;
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using FCInvoiceUI.Models;
 using FCInvoiceUI.Services;
+using System.Collections.ObjectModel;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Media;
 
 namespace FCInvoiceUI.ViewModels;
 
 public partial class PrintViewModel(BillingInvoice invoice) : ObservableObject
 {
-    // test anon method:
-    // public string TestText => "Binding works!";
-
     public string? BillTo { get; } = invoice.BillTo;
     public string? ProjectNumber { get; } = invoice.ProjectNumber;
     public string? InvoiceNumber { get; } = invoice.InvoiceNumber;
@@ -44,7 +41,6 @@ public partial class PrintViewModel(BillingInvoice invoice) : ObservableObject
                 break;
             }
 
-            // attempt to print
             try
             {
                 var capabilities = printDialog.PrintQueue.GetPrintCapabilities(printDialog.PrintTicket);

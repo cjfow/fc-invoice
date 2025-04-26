@@ -1,6 +1,6 @@
-﻿using System.IO;
+﻿using FCInvoiceUI.Models;
+using System.IO;
 using System.Text.Json;
-using FCInvoiceUI.Models;
 
 namespace FCInvoiceUI.Services;
 
@@ -17,7 +17,9 @@ public class JsonInvoiceStorageService : IInvoiceStorageService
         }
 
         if (!Directory.Exists(_baseDirectory))
+        {
             Directory.CreateDirectory(_baseDirectory);
+        }
 
         string fileName = Path.Combine(_baseDirectory, $"{invoice.InvoiceNumber}.json");
 

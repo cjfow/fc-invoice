@@ -50,7 +50,7 @@ public partial class MainViewModel : ObservableObject
     }
 
     [ObservableProperty]
-    private BillingInvoice invoice;
+    private BillingInvoice _invoice;
 
     public ObservableCollection<InvoiceItem> InvoiceItems => Invoice.Items;
 
@@ -122,8 +122,6 @@ public partial class MainViewModel : ObservableObject
         var previewWindow = new PrintView(Invoice);
         previewWindow.ShowDialog();
     }
-
-
 
     [RelayCommand]
     private void AddRow()

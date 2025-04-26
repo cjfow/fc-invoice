@@ -1,7 +1,6 @@
 ﻿using FCInvoiceUI.Models;
 using FCInvoiceUI.ViewModels;
 using System.Windows;
-using System.Windows.Media;
 
 namespace FCInvoiceUI.Views;
 
@@ -16,4 +15,3 @@ public partial class PrintView : Window
         DataContext = new PrintViewModel(invoice);
     }
 }
-

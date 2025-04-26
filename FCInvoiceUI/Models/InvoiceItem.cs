@@ -46,7 +46,6 @@ public class InvoiceItem : INotifyPropertyChanged
         }
     }
 
-
     public decimal Amount
     {
         get
