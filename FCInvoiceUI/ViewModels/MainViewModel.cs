@@ -12,7 +12,6 @@ namespace FCInvoiceUI.ViewModels;
 public partial class MainViewModel : ObservableObject
 {
     private readonly ComboBoxFormatService _comboBoxService;
-
     private readonly BillingInvoice _currentInvoiceHolder;
     private BillingInvoice? _originalInvoiceCache;
 
