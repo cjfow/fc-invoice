@@ -38,7 +38,6 @@ public class ComboBoxFormatService
                 continue;
             }
         }
-
         return [..invoices.OrderByDescending(i => i.InvoiceNumber)];
     }
 }

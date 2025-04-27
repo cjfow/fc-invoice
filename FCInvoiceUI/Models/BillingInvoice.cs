@@ -5,6 +5,19 @@ namespace FCInvoiceUI.Models;
 
 public class BillingInvoice : INotifyPropertyChanged
 {
+    public bool IsCurrentInvoice { get; set; }
+
+    public string DisplayName
+    {
+        get
+        {
+            if (IsCurrentInvoice)
+                return InvoiceNumber is not null ? $"Current Invoice ({InvoiceNumber})" : "Current Invoice";
+            else
+                return InvoiceNumber ?? "Unnamed Invoice";
+        }
+    }
+
     private DateTime _selectedDate = DateTime.Today;
     public DateTime SelectedDate
     {

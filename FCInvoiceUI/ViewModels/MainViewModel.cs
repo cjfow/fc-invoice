@@ -1,14 +1,19 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using FCInvoiceUI.Models;
 using FCInvoiceUI.Services;
+using FCInvoiceUI.Views;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 
 namespace FCInvoiceUI.ViewModels;
 
+// TODO: abstract some functionality to services/helper classes. its getting a little congested..
 public partial class MainViewModel : ObservableObject
 {
     private readonly ComboBoxFormatService _comboBoxService;
+
+    private readonly BillingInvoice _currentInvoiceHolder;
     private BillingInvoice? _originalInvoiceCache;
 
     public MainViewModel()
@@ -17,16 +22,75 @@ public partial class MainViewModel : ObservableObject
 
         Invoice = new BillingInvoice
         {
-            InvoiceNumber = InvoiceNumberGeneratorService.GetNextInvoiceNumber()
+            InvoiceNumber = InvoiceNumberGeneratorService.GetNextInvoiceNumber(),
+            IsCurrentInvoice = true
         };
 
-        InitializeInvoiceEventHooks(Invoice);
+        _currentInvoiceHolder = Invoice;
 
+        for (int i = 0; i < 3; i++)
+        {
+            Invoice.Items.Add(new InvoiceItem());
+        }
+
+        InitializeInvoiceEventHooks(Invoice);
         LoadComboBoxItems();
     }
 
     [ObservableProperty]
     private BillingInvoice _invoice;
+
+    public string? BillTo
+    {
+        get => Invoice.BillTo;
+        set
+        {
+            if (Invoice.BillTo != value)
+            {
+                Invoice.BillTo = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    public string? ProjectNumber
+    {
+        get => Invoice.ProjectNumber;
+        set
+        {
+            if (Invoice.ProjectNumber != value)
+            {
+                Invoice.ProjectNumber = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    public DateTime SelectedDate
+    {
+        get => Invoice.SelectedDate;
+        set
+        {
+            if (Invoice.SelectedDate != value)
+            {
+                Invoice.SelectedDate = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    public string? InvoiceNumber
+    {
+        get => Invoice.InvoiceNumber;
+        set
+        {
+            if (Invoice.InvoiceNumber != value)
+            {
+                Invoice.InvoiceNumber = value;
+                OnPropertyChanged();
+            }
+        }
+    }
 
     public ObservableCollection<InvoiceItem> InvoiceItems => Invoice.Items;
 
@@ -43,14 +107,15 @@ public partial class MainViewModel : ObservableObject
             if (!SetProperty(ref _selectedInvoice, value) || value is null)
                 return;
 
-            if (value == Invoice)
+            if (ReferenceEquals(value, _currentInvoiceHolder))
             {
                 RestoreOriginalInvoice();
-                return;
             }
-
-            CacheCurrentInvoice();
-            OverwriteInvoice(value);
+            else
+            {
+                CacheCurrentInvoice();
+                CopyInvoice(value, overwriteInvoiceNumber: true);
+            }
         }
     }
 
@@ -59,21 +124,22 @@ public partial class MainViewModel : ObservableObject
         var previousInvoices = _comboBoxService.LoadPreviousInvoices();
 
         FilteredInvoices.Clear();
-        FilteredInvoices.Add(Invoice);
-        foreach (var invoice in previousInvoices)
+        FilteredInvoices.Add(_currentInvoiceHolder);
+
+        foreach (var invoice in previousInvoices.OrderByDescending(i => i.InvoiceNumber))
         {
             FilteredInvoices.Add(invoice);
         }
 
-        SelectedInvoice = Invoice;
+        SelectedInvoice = _currentInvoiceHolder;
     }
 
     private void RestoreOriginalInvoice()
     {
-        if (_originalInvoiceCache is null)
-            return;
-
-        CopyInvoice(_originalInvoiceCache);
+        if (_originalInvoiceCache is not null)
+        {
+            CopyInvoice(_originalInvoiceCache);
+        }
     }
 
     private void CacheCurrentInvoice()
@@ -93,20 +159,19 @@ public partial class MainViewModel : ObservableObject
         };
     }
 
-    private void OverwriteInvoice(BillingInvoice source)
+    private void CopyInvoice(BillingInvoice defaults, bool overwriteInvoiceNumber = false)
     {
-        CopyInvoice(source);
-    }
+        Invoice.BillTo = defaults.BillTo ?? "J.C. Concrete Inc.";
+        Invoice.ProjectNumber = defaults.ProjectNumber ?? $"{DateTime.Today:yy}-000";
+        Invoice.SelectedDate = defaults.SelectedDate;
 
-    private void CopyInvoice(BillingInvoice source)
-    {
-        Invoice.BillTo = source.BillTo;
-        Invoice.ProjectNumber = source.ProjectNumber;
-        Invoice.SelectedDate = source.SelectedDate;
-        Invoice.InvoiceNumber = source.InvoiceNumber;
+        if (overwriteInvoiceNumber && !Invoice.IsCurrentInvoice)
+        {
+            Invoice.InvoiceNumber = defaults.InvoiceNumber ?? InvoiceNumberGeneratorService.GetNextInvoiceNumber();
+        }
 
         Invoice.Items.Clear();
-        foreach (var item in source.Items)
+        foreach (var item in defaults.Items)
         {
             var newItem = new InvoiceItem
             {
@@ -157,5 +222,12 @@ public partial class MainViewModel : ObservableObject
         {
             OnPropertyChanged(nameof(Total));
         }
+    }
+
+    [RelayCommand]
+    private void OpenPrintPreview()
+    {
+        PrintView previewWindow = new(Invoice);
+        previewWindow.ShowDialog();
     }
 }

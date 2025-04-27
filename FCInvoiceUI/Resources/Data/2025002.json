@@ -1,0 +1,28 @@
+{
+  "IsCurrentInvoice": true,
+  "SelectedDate": "2025-04-27T00:00:00-04:00",
+  "InvoiceNumber": "2025002",
+  "ProjectNumber": "25-000",
+  "BillTo": "J.C. Concrete Inc.",
+  "Items": [
+    {
+      "Quantity": null,
+      "Description": "test",
+      "Rate": null,
+      "Amount": 0
+    },
+    {
+      "Quantity": null,
+      "Description": null,
+      "Rate": null,
+      "Amount": 0
+    },
+    {
+      "Quantity": null,
+      "Description": null,
+      "Rate": null,
+      "Amount": 0
+    }
+  ],
+  "Total": 0
+}

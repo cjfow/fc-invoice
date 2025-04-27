@@ -197,19 +197,16 @@
                             Binding="{Binding Quantity, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, StringFormat=N0}"
                             Width="100"/>
 
-                    <!-- description (multiline) -->
                     <DataGridTextColumn Header="Description"
                                         Binding="{Binding Description, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                         Width="*"
                                         ElementStyle="{StaticResource MultiLineTextBlockStyle}"
                                         EditingElementStyle="{StaticResource MultiLineTextBoxStyle}"/>
 
-                    <!-- rate -->
                     <DataGridTextColumn Header="Rate"
                                         Binding="{Binding Rate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, StringFormat='{}${0:N2}'}"
                                         Width="100"/>
 
-                    <!-- amount (readonly) -->
                     <DataGridTextColumn Header="Amount"
                                         Binding="{Binding Amount, Mode=OneWay, StringFormat='{}${0:N2}'}"
                                         Width="100"
@@ -242,7 +239,6 @@
                       IsTextSearchEnabled="False"
                       ItemsSource="{Binding FilteredInvoices}"
                       SelectedItem="{Binding SelectedInvoice, Mode=TwoWay}"
-                      Text="{Binding SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                       DisplayMemberPath="InvoiceNumber" />
 
             <StackPanel Grid.Column="1"
