@@ -104,6 +104,5 @@ public class BillingInvoice : INotifyPropertyChanged
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
-    private void OnPropertyChanged(string propertyName)
-        => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    private void OnPropertyChanged(string propertyName) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 }

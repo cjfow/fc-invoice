@@ -1,5 +1,4 @@
-﻿using System;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 
 namespace FCInvoiceUI.Models;
 
@@ -12,7 +11,11 @@ public class InvoiceItem : INotifyPropertyChanged
         get => _quantity;
         set
         {
-            if (_quantity == value) return;
+            if (_quantity == value)
+            {
+                return;
+            }
+
             _quantity = value;
             OnPropertyChanged(nameof(Quantity));
             OnPropertyChanged(nameof(Amount));
@@ -26,7 +29,11 @@ public class InvoiceItem : INotifyPropertyChanged
         get => _description;
         set
         {
-            if (_description == value) return;
+            if (_description == value)
+            {
+                return;
+            }
+
             _description = value;
             OnPropertyChanged(nameof(Description));
         }
@@ -39,7 +46,11 @@ public class InvoiceItem : INotifyPropertyChanged
         get => _rate;
         set
         {
-            if (_rate == value) return;
+            if (_rate == value)
+            {
+                return;
+            }
+
             _rate = value;
             OnPropertyChanged(nameof(Rate));
             OnPropertyChanged(nameof(Amount));
@@ -58,6 +69,5 @@ public class InvoiceItem : INotifyPropertyChanged
     public event PropertyChangedEventHandler? PropertyChanged;
 
     // notifies ui that a property is changed (if not null) so it can update
-    private void OnPropertyChanged(string propName)
-        => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propName));
+    private void OnPropertyChanged(string propName) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propName));
 }

@@ -26,7 +26,9 @@ public partial class PrintViewModel(BillingInvoice invoice) : ObservableObject
         foreach (Window window in Application.Current.Windows)
         {
             if (!window.Title.Contains("Invoice"))
+            {
                 continue;
+            }
 
             if (window.FindName("PaperVisual") is not FrameworkElement element)
             {
@@ -34,7 +36,8 @@ public partial class PrintViewModel(BillingInvoice invoice) : ObservableObject
                 return;
             }
 
-            var printDialog = new PrintDialog();
+            PrintDialog printDialog = new();
+
             if (printDialog.ShowDialog() != true)
             {
                 MessageBox.Show("Print canceled.");
@@ -51,8 +54,7 @@ public partial class PrintViewModel(BillingInvoice invoice) : ObservableObject
                 element.Arrange(new Rect(new Point(0, 0), element.DesiredSize));
                 element.UpdateLayout();
 
-                double scale = Math.Min(printableWidth / element.DesiredSize.Width,
-                    printableHeight / element.DesiredSize.Height);
+                double scale = Math.Min(printableWidth / element.DesiredSize.Width, printableHeight / element.DesiredSize.Height);
 
                 var originalTransform = element.LayoutTransform;
                 element.LayoutTransform = new ScaleTransform(scale, scale);
@@ -81,7 +83,7 @@ public partial class PrintViewModel(BillingInvoice invoice) : ObservableObject
 
         try
         {
-            var jsonService = new JsonInvoiceStorageService();
+            JsonInvoiceStorageService jsonService = new();
             await jsonService.SaveInvoiceAsync(invoice);
             MessageBox.Show("Save complete!");
         }

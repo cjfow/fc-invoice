@@ -20,7 +20,7 @@
         <Style TargetType="TextBlock">
             <Setter Property="FontSize"
                     Value="18" />
-            
+
             <Setter Property="VerticalAlignment"
                     Value="Center" />
 
@@ -345,7 +345,7 @@
                 </Border>
             </Viewbox>
         </StackPanel>
-        
+
         <Button Content="Print and Save"
                 Width="160"
                 Height="40"

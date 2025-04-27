@@ -36,7 +36,9 @@ public class JsonInvoiceStorageService : IInvoiceStorageService
         string fileName = Path.Combine(_baseDirectory, $"{invoiceNumber}.json");
 
         if (!File.Exists(fileName))
+        {
             return null;
+        }
 
         string json = await File.ReadAllTextAsync(fileName);
         return JsonSerializer.Deserialize<BillingInvoice>(json);
@@ -45,7 +47,7 @@ public class JsonInvoiceStorageService : IInvoiceStorageService
     public async Task<IEnumerable<BillingInvoice>> LoadAllInvoicesAsync()
     {
         Directory.CreateDirectory(_baseDirectory);
-        var invoices = new List<BillingInvoice>();
+        List<BillingInvoice> invoices = [];
 
         foreach (string file in Directory.GetFiles(_baseDirectory, "*.json"))
         {

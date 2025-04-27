@@ -20,11 +20,10 @@
         WindowStartupLocation="CenterScreen">
 
     <Grid>
-        <!-- background gradient -->
         <Grid.Background>
             <LinearGradientBrush StartPoint="0,0" 
                                  EndPoint="1,1">
-                
+
                 <GradientStop Color="{StaticResource primaryBackColor}"
                               Offset="0.0" />
                 <GradientStop Color="{StaticResource secondaryBackColor}"
@@ -32,7 +31,6 @@
             </LinearGradientBrush>
         </Grid.Background>
 
-        <!-- 4 rows: header, bill row, main content, footer where the button and total is -->
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
@@ -40,7 +38,6 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <!-- row 0: header section -->
         <Grid Grid.Row="0"
               Margin="20">
             <Grid.ColumnDefinitions>
@@ -50,39 +47,37 @@
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
 
-            <!-- program title -->
             <TextBlock Grid.Column="0"
                    Text="Simplified Invoice Program"
                    FontSize="16"
                    VerticalAlignment="Center"
                    Margin="20,0,20,0"/>
 
-            <!-- select date datepicker -->
             <StackPanel Grid.Column="1"
                     Orientation="Horizontal"
                     Margin="20,0">
-                
+
                 <TextBlock Text="Select Date:" 
                        VerticalAlignment="Center" 
                        Margin="0,0,5,0"/>
-                
+
                 <DatePicker Width="120"
                         Height="30" 
                         SelectedDate="{Binding SelectedDate, Mode=TwoWay}"
                         SelectedDateFormat="Short">
-                    
+
                     <DatePicker.Resources>
                         <Style TargetType="DatePickerTextBox">
-                            
+
                             <Setter Property="VerticalContentAlignment"
                                     Value="Center"/>
-                            
+
                             <Setter Property="Padding"
                                     Value="0,0,0,0"/>
-                            
+
                             <Setter Property="Margin"
                                     Value="0"/>
-                            
+
                             <Setter Property="Template">
                                 <Setter.Value>
                                     <ControlTemplate TargetType="DatePickerTextBox">
@@ -102,30 +97,28 @@
                 </DatePicker>
             </StackPanel>
 
-            <!-- invoice number textbox -->
             <StackPanel Grid.Column="2"
                         Orientation="Horizontal"
                         Margin="20,0">
-                
+
                 <TextBlock Text="Invoice #:" 
                            VerticalAlignment="Center" 
                            Margin="0,0,5,0"/>
-                
+
                 <TextBox Width="100" 
                          Height="30" 
                          VerticalContentAlignment="Center"
                          Text="{Binding InvoiceNumber, Mode=TwoWay}"/>
             </StackPanel>
 
-            <!-- project number textbox -->
             <StackPanel Grid.Column="3"
                         Orientation="Horizontal"
-                        Margin="20,0">  
-                
+                        Margin="20,0">
+
                 <TextBlock Text="Project #:" 
                        VerticalAlignment="Center" 
                        Margin="0,0,5,0"/>
-                
+
                 <TextBox Width="100"
                      Height="30" 
                      VerticalContentAlignment="Center"
@@ -133,26 +126,23 @@
             </StackPanel>
         </Grid>
 
-        <!-- row 1: billing row -->
         <StackPanel Grid.Row="1"
                     Orientation="Horizontal"
                     Margin="20,0">
-            
+
             <TextBlock Text="Bill:"
                        VerticalAlignment="Center"
                        Margin="0,0,5,0"/>
-            
-            <!-- textbox for the name of who to bill -->
+
             <TextBox Width="300"
                      Height="30" 
                      VerticalContentAlignment="Center"
                      Text="{Binding BillTo, Mode=TwoWay}"/>
         </StackPanel>
 
-        <!-- row 2: invoice details area using a datagrid -->
         <Grid Grid.Row="2"
               Margin="20">
-            
+
             <DataGrid ItemsSource="{Binding InvoiceItems}"
                       AutoGenerateColumns="False"
                       CanUserAddRows="False"
@@ -179,33 +169,30 @@
 
 
                 <DataGrid.Resources>
-                    <!-- style for multiline text display -->
                     <Style x:Key="MultiLineTextBlockStyle"
                            TargetType="TextBlock">
-                        
+
                         <Setter Property="TextWrapping"
                                 Value="Wrap"/>
-                        
+
                         <Setter Property="VerticalAlignment"
                                 Value="Top"/>
                     </Style>
-                    <!-- style for multiline text editing -->
                     <Style x:Key="MultiLineTextBoxStyle"
                            TargetType="TextBox">
-                        
+
                         <Setter Property="AcceptsReturn"
                                 Value="True"/>
-                        
+
                         <Setter Property="TextWrapping"
                                 Value="Wrap"/>
-                        
+
                         <Setter Property="VerticalContentAlignment"
                                 Value="Top"/>
                     </Style>
                 </DataGrid.Resources>
 
                 <DataGrid.Columns>
-                    <!-- quantity -->
                     <DataGridTextColumn Header="Quantity"
                             Binding="{Binding Quantity, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, StringFormat=N0}"
                             Width="100"/>
@@ -231,43 +218,42 @@
             </DataGrid>
         </Grid>
 
-
-        <!-- row 3: footer -->
         <Grid Grid.Row="3"
               Margin="15">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
-            
-            <!-- preview print button -->
+
             <Button Grid.Column="0"
                     Content="Print Preview"
                     HorizontalAlignment="Center"
-                    Margin="300,0,0,0"
+                    Margin="300,0,0,20"
                     Width="150"
                     Height="35"
                     Command="{Binding OpenPrintPreviewCommand}" />
 
             <ComboBox Grid.Column="0"
                       HorizontalAlignment="Center"
-                      Margin="0,0,300,0"
+                      Margin="0,0,300,20"
                       Width="200"
                       Height="35"
-                      SelectedItem=""
-                      DisplayMemberPath="InoviceNumber">
-            </ComboBox>
+                      IsEditable="True"
+                      IsTextSearchEnabled="False"
+                      ItemsSource="{Binding FilteredInvoices}"
+                      SelectedItem="{Binding SelectedInvoice, Mode=TwoWay}"
+                      Text="{Binding SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                      DisplayMemberPath="InvoiceNumber" />
 
-            <!-- total display -->
             <StackPanel Grid.Column="1"
                         Margin="0,0,20,0"
                         Orientation="Horizontal"
                         HorizontalAlignment="Right">
-                
+
                 <TextBlock Text="Total:"
                            VerticalAlignment="Center"
                            Margin="0,0,5,0"/>
-                
+
                 <TextBlock Text="{Binding Total, StringFormat='{}${0:N2}'}"
                            VerticalAlignment="Center"/>
             </StackPanel>
