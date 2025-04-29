@@ -141,7 +141,7 @@ public partial class MainViewModel : ObservableObject
         }
     }
 
-    private void CacheCurrentInvoice()
+    public void CacheCurrentInvoice()
     {
         _originalInvoiceCache = new BillingInvoice
         {

@@ -30,7 +30,6 @@ public class JsonInvoiceStorageService : IInvoiceStorageService
         await File.WriteAllTextAsync(fileName, json);
     }
 
-
     public async Task<BillingInvoice?> LoadInvoiceAsync(string invoiceNumber)
     {
         string fileName = Path.Combine(_baseDirectory, $"{invoiceNumber}.json");

@@ -77,7 +77,6 @@ public partial class PrintViewModel(BillingInvoice invoice) : ObservableObject
             {
                 MessageBox.Show($"Printing failed: {ex.Message}");
             }
-
             break;
         }
 

@@ -5,7 +5,6 @@ namespace FCInvoiceUI.Models;
 public class InvoiceItem : INotifyPropertyChanged
 {
     private ushort? _quantity;
-
     public ushort? Quantity
     {
         get => _quantity;
@@ -23,7 +22,6 @@ public class InvoiceItem : INotifyPropertyChanged
     }
 
     private string? _description;
-
     public string? Description
     {
         get => _description;
@@ -40,7 +38,6 @@ public class InvoiceItem : INotifyPropertyChanged
     }
 
     private decimal? _rate;
-
     public decimal? Rate
     {
         get => _rate;
