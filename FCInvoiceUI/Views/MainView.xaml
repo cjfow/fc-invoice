@@ -9,7 +9,7 @@
         xmlns:models="clr-namespace:FCInvoiceUI.Models"
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance Type=vm:MainViewModel, IsDesignTimeCreatable=True}"
-        Title="MainView"
+        Title="F.C. Invoice"
         Height="800"
         Width="1200"
         FontFamily="Segoe UI"

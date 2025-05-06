@@ -32,13 +32,13 @@ public partial class PrintViewModel(BillingInvoice invoice) : ObservableObject
 
             if (window.FindName("PaperVisual") is not FrameworkElement element)
             {
-                MessageBox.Show("Print preview not found :(");
+                MessageBox.Show("Print preview not found");
                 return;
             }
 
             PrintDialog printDialog = new();
 
-            if (printDialog.ShowDialog() != true)
+            if (printDialog.ShowDialog() is not true)
             {
                 MessageBox.Show("Print canceled.");
                 break;

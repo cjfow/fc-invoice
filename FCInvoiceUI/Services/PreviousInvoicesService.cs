@@ -113,7 +113,8 @@ class PreviousInvoicesService
             return false;
         }
 
-        return int.TryParse(invoiceNumber.AsSpan(0, 4), out _) && int.TryParse(invoiceNumber.AsSpan(4), out _);
+        return int.TryParse(invoiceNumber.AsSpan(0, 4), out _) &&
+          int.TryParse(invoiceNumber.AsSpan(4), out _);
     }
 
     private void LogError(string message)

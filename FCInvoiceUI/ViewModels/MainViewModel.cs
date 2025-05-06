@@ -92,9 +92,7 @@ public partial class MainViewModel : ObservableObject
     }
 
     public ObservableCollection<InvoiceItem> InvoiceItems => Invoice.Items;
-
     public decimal Total => Invoice.Total;
-
     public ObservableCollection<BillingInvoice> FilteredInvoices { get; } = [];
 
     private BillingInvoice? _selectedInvoice;
