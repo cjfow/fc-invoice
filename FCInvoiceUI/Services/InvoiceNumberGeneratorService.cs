@@ -21,7 +21,7 @@ class InvoiceNumberGeneratorService
         var invoiceFiles = Directory.GetFiles(_folderPath, "*.json")
             .Select(Path.GetFileNameWithoutExtension)
             .OfType<string>()
-            .Where(name => name is not null && name.Length == 7 && name.StartsWith(currentYear.ToString()))
+            .Where(name => name is not null && name.Length == 7 &&name.StartsWith(currentYear.ToString()))
             .ToList();
 
         List<int> invoiceNumbers = [];

@@ -78,10 +78,12 @@ public class MainViewModelTests
 
         viewModel.BillTo = "Modified BillTo";
 
+        viewModel.SelectedInvoice = null;
         viewModel.SelectedInvoice = viewModel.FilteredInvoices.FirstOrDefault();
 
         Assert.AreEqual("Original BillTo", viewModel.BillTo);
     }
+
 
     [TestMethod]
     public void SelectingDifferentInvoice_ShouldCopyInvoice()
