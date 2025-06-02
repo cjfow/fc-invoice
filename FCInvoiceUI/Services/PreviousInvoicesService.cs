@@ -6,9 +6,16 @@ namespace FCInvoiceUI.Services;
 
 class PreviousInvoicesService
 {
-    private readonly string _invoicesFolderPath = @"C:\Users\cfowl\source\repos\FCInvoice\FCInvoiceUI\Resources\Data\";
-    private readonly string _errorLogPath = @"C:\Users\cfowl\source\repos\FCInvoice\FCInvoiceUI\Resources\InvoiceLoadErrors.txt";
+    private readonly string _invoicesFolderPath;
+    private readonly string _errorLogPath;
     private readonly EncryptionService _encryptionService = new();
+
+    public PreviousInvoicesService()
+    {
+        string basePath = Path.Combine(AppContext.BaseDirectory, "Resources", "Data");
+        _invoicesFolderPath = basePath;
+        _errorLogPath = Path.Combine(basePath, "InvoiceLoadErrors.txt");
+    }
 
     public IEnumerable<BillingInvoice> LoadAllPreviousInvoices()
     {

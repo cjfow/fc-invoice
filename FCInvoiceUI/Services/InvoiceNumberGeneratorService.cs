@@ -4,21 +4,21 @@ namespace FCInvoiceUI.Services;
 
 class InvoiceNumberGeneratorService
 {
-    private const string c_FolderPath = @"C:\Users\cfowl\source\repos\FCInvoice\FCInvoiceUI\Resources\Data";
+    private static readonly string s_folderPath = Path.Combine(AppContext.BaseDirectory, "Resources", "Data");
 
     public static string GetNextInvoiceNumber()
     {
         int currentYear = DateTime.Today.Year;
 
-        if (!Directory.Exists(c_FolderPath))
+        if (!Directory.Exists(s_folderPath))
         {
-            Directory.CreateDirectory(c_FolderPath);
+            Directory.CreateDirectory(s_folderPath);
             return $"{currentYear}001";
         }
 
         // get all the current files in the data folder, remove .enc ext,
         // gets type of string as a null check, make sure they fit the yyyyxxx format, make them a list
-        var invoiceFiles = Directory.GetFiles(c_FolderPath, "*.enc")
+        var invoiceFiles = Directory.GetFiles(s_folderPath, "*.enc")
             .Select(Path.GetFileNameWithoutExtension)
             .OfType<string>()
             .Where(name => name is not null && name.Length == 7 && name.StartsWith(currentYear.ToString()))

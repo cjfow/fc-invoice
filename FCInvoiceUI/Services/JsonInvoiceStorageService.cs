@@ -6,9 +6,14 @@ namespace FCInvoiceUI.Services;
 
 public class JsonInvoiceStorageService : IInvoiceStorageService
 {
-    private readonly string _baseDirectory = @"C:\Users\cfowl\source\repos\FCInvoice\FCInvoiceUI\Resources\Data";
+    private readonly string _baseDirectory;
     private readonly EncryptionService _encryptionService = new();
     private readonly JsonSerializerOptions _cachedJsonSerializerOptions = new() { WriteIndented = true };
+
+    public JsonInvoiceStorageService()
+    {
+        _baseDirectory = Path.Combine(AppContext.BaseDirectory, "Resources", "Data");
+    }
 
     public async Task SaveInvoiceAsync(BillingInvoice invoice)
     {

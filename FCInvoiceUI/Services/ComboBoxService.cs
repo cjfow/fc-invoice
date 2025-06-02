@@ -7,8 +7,13 @@ namespace FCInvoiceUI.Services;
 
 public class ComboBoxFormatService
 {
-    private readonly string _invoicesFolderPath = @"C:\Users\cfowl\source\repos\FCInvoice\FCInvoiceUI\Resources\Data\";
+    private readonly string _invoicesFolderPath;
     private readonly EncryptionService _encryptionService = new();
+
+    public ComboBoxFormatService()
+    {
+        _invoicesFolderPath = Path.Combine(AppContext.BaseDirectory, "Resources", "Data");
+    }
 
     public ObservableCollection<BillingInvoice> LoadPreviousInvoices()
     {

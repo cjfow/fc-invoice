@@ -6,10 +6,12 @@ namespace FCInvoiceUI.Services;
 
 public class EncryptionService
 {
-    private readonly string _keyFilePath = @"C:\Users\cfowl\source\repos\FCInvoice\FCInvoiceUI\Resources\Data\KeyIV.dat";
+    private readonly string _keyFilePath;
 
     public EncryptionService()
     {
+        _keyFilePath = Path.Combine(AppContext.BaseDirectory, "Resources", "Data", "KeyIV.dat");
+
         if (!File.Exists(_keyFilePath))
         {
             var (key, iv) = GenerateKeyAndIV();
