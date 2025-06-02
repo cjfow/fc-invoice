@@ -8,6 +8,7 @@ class PreviousInvoicesService
 {
     private readonly string _invoicesFolderPath = @"C:\Users\cfowl\source\repos\FCInvoice\FCInvoiceUI\Resources\Data\";
     private readonly string _errorLogPath = @"C:\Users\cfowl\source\repos\FCInvoice\FCInvoiceUI\Resources\InvoiceLoadErrors.txt";
+    private readonly EncryptionService _encryptionService = new();
 
     public IEnumerable<BillingInvoice> LoadAllPreviousInvoices()
     {
@@ -40,7 +41,7 @@ class PreviousInvoicesService
             return null;
         }
 
-        string filePath = Path.Combine(_invoicesFolderPath, $"{invoiceNumber}.json");
+        string filePath = Path.Combine(_invoicesFolderPath, $"{invoiceNumber}.enc");
 
         if (!File.Exists(filePath))
         {
@@ -124,7 +125,7 @@ class PreviousInvoicesService
         }
 
         return int.TryParse(invoiceNumber.AsSpan(0, 4), out _) &&
-          int.TryParse(invoiceNumber.AsSpan(4), out _);
+               int.TryParse(invoiceNumber.AsSpan(4), out _);
     }
 
     private void LogError(string message)

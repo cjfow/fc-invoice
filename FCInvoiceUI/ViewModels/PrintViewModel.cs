@@ -21,70 +21,68 @@ public partial class PrintViewModel(BillingInvoice invoice) : ObservableObject
     [RelayCommand]
     public async Task PrintAndSaveAsync()
     {
-        // TESTING: MessageBox.Show("Command reached.");
-
         foreach (Window window in Application.Current.Windows)
         {
-            if (!window.Title.Contains("Invoice"))
+            if (!window.Title.Equals("Invoice Print Preview", StringComparison.OrdinalIgnoreCase))
             {
                 continue;
             }
 
-            if (window.FindName("PaperVisual") is not FrameworkElement element)
+            if (LogicalTreeHelper.FindLogicalNode(window, "PaperVisual") is not FrameworkElement paperVisual)
             {
-                MessageBox.Show("Print preview not found");
+                MessageBox.Show("Print preview not found.", "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
 
-            PrintDialog printDialog = new();
-
-            if (printDialog.ShowDialog() is not true)
+            var printDialog = new PrintDialog();
+            if (printDialog.ShowDialog() != true)
             {
-                MessageBox.Show("Print canceled.");
+                MessageBox.Show("Print canceled.", "Notice", MessageBoxButton.OK, MessageBoxImage.Information);
                 break;
             }
 
             try
             {
                 var capabilities = printDialog.PrintQueue.GetPrintCapabilities(printDialog.PrintTicket);
-                var printableWidth = capabilities.PageImageableArea.ExtentWidth;
-                var printableHeight = capabilities.PageImageableArea.ExtentHeight;
+                double printableWidth = capabilities.PageImageableArea.ExtentWidth;
+                double printableHeight = capabilities.PageImageableArea.ExtentHeight;
 
-                element.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
-                element.Arrange(new Rect(new Point(0, 0), element.DesiredSize));
-                element.UpdateLayout();
+                paperVisual.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
+                paperVisual.Arrange(new Rect(new Point(0, 0), paperVisual.DesiredSize));
+                paperVisual.UpdateLayout();
 
-                double scale = Math.Min(printableWidth / element.DesiredSize.Width, printableHeight / element.DesiredSize.Height);
+                double scale = Math.Min(printableWidth / paperVisual.DesiredSize.Width, printableHeight / paperVisual.DesiredSize.Height);
 
-                var originalTransform = element.LayoutTransform;
-                element.LayoutTransform = new ScaleTransform(scale, scale);
+                var originalTransform = paperVisual.LayoutTransform;
+                paperVisual.LayoutTransform = new ScaleTransform(scale, scale);
 
-                var scaledSize = new Size(element.DesiredSize.Width * scale, element.DesiredSize.Height * scale);
-                element.Measure(scaledSize);
-                element.Arrange(new Rect(new Point(0, 0), scaledSize));
-                element.UpdateLayout();
+                var scaledSize = new Size(paperVisual.DesiredSize.Width * scale, paperVisual.DesiredSize.Height * scale);
+                paperVisual.Measure(scaledSize);
+                paperVisual.Arrange(new Rect(new Point(0, 0), scaledSize));
+                paperVisual.UpdateLayout();
 
                 await Application.Current.Dispatcher.InvokeAsync(() =>
                 {
-                    printDialog.PrintVisual(element, "Invoice Print");
+                    printDialog.PrintVisual(paperVisual, "Invoice Print");
                 });
 
-                element.LayoutTransform = originalTransform;
+                paperVisual.LayoutTransform = originalTransform;
 
-                MessageBox.Show($"Printing to: {printDialog.PrintQueue.Name}");
+                MessageBox.Show($"Printed to: {printDialog.PrintQueue.Name}", "Print Complete", MessageBoxButton.OK, MessageBoxImage.Information);
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Printing failed: {ex.Message}");
+                MessageBox.Show($"Printing failed: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
+
             break;
         }
 
         try
         {
-            JsonInvoiceStorageService jsonService = new();
+            var jsonService = new JsonInvoiceStorageService();
             await jsonService.SaveInvoiceAsync(invoice);
-            MessageBox.Show("Save complete!");
+            MessageBox.Show("Save complete!", "Save Success", MessageBoxButton.OK, MessageBoxImage.Information);
         }
         catch (Exception ex)
         {
