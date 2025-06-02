@@ -8,6 +8,7 @@ class PreviousInvoicesService
 {
     private readonly string _invoicesFolderPath = @"C:\Users\cfowl\source\repos\FCInvoice\FCInvoiceUI\Resources\Data\";
     private readonly string _errorLogPath = @"C:\Users\cfowl\source\repos\FCInvoice\FCInvoiceUI\Resources\InvoiceLoadErrors.txt";
+    private readonly EncryptionService _encryptionService = new();
 
     public IEnumerable<BillingInvoice> LoadAllPreviousInvoices()
     {
@@ -16,7 +17,7 @@ class PreviousInvoicesService
             return [];
         }
 
-        string[] invoiceFiles = Directory.GetFiles(_invoicesFolderPath, "*.json");
+        string[] invoiceFiles = Directory.GetFiles(_invoicesFolderPath, "*.enc");
 
         List<BillingInvoice> validInvoices = [];
 
@@ -40,7 +41,7 @@ class PreviousInvoicesService
             return null;
         }
 
-        string filePath = Path.Combine(_invoicesFolderPath, $"{invoiceNumber}.json");
+        string filePath = Path.Combine(_invoicesFolderPath, $"{invoiceNumber}.enc");
 
         if (!File.Exists(filePath))
         {
@@ -59,7 +60,7 @@ class PreviousInvoicesService
             Directory.CreateDirectory(_invoicesFolderPath);
         }
 
-        string[] invoiceFiles = Directory.GetFiles(_invoicesFolderPath, "*.json");
+        string[] invoiceFiles = Directory.GetFiles(_invoicesFolderPath, "*.enc");
 
         List<int> validCounts = [];
 
@@ -88,9 +89,12 @@ class PreviousInvoicesService
                 return null;
             }
 
-            string jsonContent = File.ReadAllText(filePath);
+            string encryptedContent = File.ReadAllText(filePath);
 
-            var invoice = JsonSerializer.Deserialize<BillingInvoice>(jsonContent);
+            // decrypt before deserializing
+            string decryptedJson = _encryptionService.Decrypt(encryptedContent);
+
+            var invoice = JsonSerializer.Deserialize<BillingInvoice>(decryptedJson);
 
             if (invoice is null)
             {
@@ -114,7 +118,7 @@ class PreviousInvoicesService
         }
 
         return int.TryParse(invoiceNumber.AsSpan(0, 4), out _) &&
-          int.TryParse(invoiceNumber.AsSpan(4), out _);
+               int.TryParse(invoiceNumber.AsSpan(4), out _);
     }
 
     private void LogError(string message)

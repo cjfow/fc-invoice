@@ -1,19 +1,23 @@
 ﻿using FCInvoiceUI.Models;
+using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
+using System.Threading.Tasks;
 
 namespace FCInvoiceUI.Services;
 
 public class JsonInvoiceStorageService : IInvoiceStorageService
 {
     private readonly string _baseDirectory = @"C:\Users\cfowl\source\repos\FCInvoice\FCInvoiceUI\Resources\Data";
+    private readonly EncryptionService _encryptionService = new();
+    private readonly JsonSerializerOptions _cachedJsonSerializerOptions = new() { WriteIndented = true };
 
     public async Task SaveInvoiceAsync(BillingInvoice invoice)
     {
         if (string.IsNullOrWhiteSpace(invoice.InvoiceNumber))
         {
-            ArgumentException argumentException = new("Invoice number must not be null or empty.", nameof(invoice));
-            throw argumentException;
+            throw new ArgumentException("Invoice number must not be null or empty.", nameof(invoice));
         }
 
         if (!Directory.Exists(_baseDirectory))
@@ -21,26 +25,34 @@ public class JsonInvoiceStorageService : IInvoiceStorageService
             Directory.CreateDirectory(_baseDirectory);
         }
 
-        string fileName = Path.Combine(_baseDirectory, $"{invoice.InvoiceNumber}.json");
+        string fileName = Path.Combine(_baseDirectory, $"{invoice.InvoiceNumber}.enc");
 
-        JsonSerializerOptions jsonSerializerOptions = new() { WriteIndented = true };
-        JsonSerializerOptions options = jsonSerializerOptions;
-        string json = JsonSerializer.Serialize(invoice, options);
-
-        await File.WriteAllTextAsync(fileName, json);
+        string json = JsonSerializer.Serialize(invoice, _cachedJsonSerializerOptions);
+        string encryptedJson = _encryptionService.Encrypt(json);
+        await File.WriteAllTextAsync(fileName, encryptedJson);
     }
 
     public async Task<BillingInvoice?> LoadInvoiceAsync(string invoiceNumber)
     {
-        string fileName = Path.Combine(_baseDirectory, $"{invoiceNumber}.json");
+        string fileName = Path.Combine(_baseDirectory, $"{invoiceNumber}.enc");
 
         if (!File.Exists(fileName))
         {
             return null;
         }
 
-        string json = await File.ReadAllTextAsync(fileName);
-        return JsonSerializer.Deserialize<BillingInvoice>(json);
+        try
+        {
+            string encryptedJson = await File.ReadAllTextAsync(fileName);
+            string decryptedJson = _encryptionService.Decrypt(encryptedJson);
+
+            return JsonSerializer.Deserialize<BillingInvoice>(decryptedJson);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Failed to load invoice {invoiceNumber}: {ex.Message}");
+            return null;
+        }
     }
 
     public async Task<IEnumerable<BillingInvoice>> LoadAllInvoicesAsync()
@@ -48,12 +60,26 @@ public class JsonInvoiceStorageService : IInvoiceStorageService
         Directory.CreateDirectory(_baseDirectory);
         List<BillingInvoice> invoices = [];
 
-        foreach (string file in Directory.GetFiles(_baseDirectory, "*.json"))
+        foreach (string file in Directory.GetFiles(_baseDirectory, "*.enc"))
         {
-            string json = await File.ReadAllTextAsync(file);
-            if (JsonSerializer.Deserialize<BillingInvoice>(json) is BillingInvoice invoice)
+            try
             {
-                invoices.Add(invoice);
+                string encryptedJson = await File.ReadAllTextAsync(file);
+                string decryptedJson = _encryptionService.Decrypt(encryptedJson);
+
+                if (JsonSerializer.Deserialize<BillingInvoice>(decryptedJson) is BillingInvoice invoice)
+                {
+                    invoices.Add(invoice);
+                }
+                else
+                {
+                    Console.WriteLine($"File deserialized to null: {file}");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"File unreadable: {file}");
+                Console.WriteLine($"Reason: {ex.Message}");
             }
         }
 
@@ -62,7 +88,7 @@ public class JsonInvoiceStorageService : IInvoiceStorageService
 
     public async Task DeleteInvoiceAsync(string invoiceNumber)
     {
-        string fileName = Path.Combine(_baseDirectory, $"{invoiceNumber}.json");
+        string fileName = Path.Combine(_baseDirectory, $"{invoiceNumber}.enc");
         if (File.Exists(fileName))
         {
             await Task.Run(() => File.Delete(fileName));
