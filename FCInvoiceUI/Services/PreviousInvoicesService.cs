@@ -16,7 +16,7 @@ class PreviousInvoicesService
             return [];
         }
 
-        string[] invoiceFiles = Directory.GetFiles(_invoicesFolderPath, "*.json");
+        string[] invoiceFiles = Directory.GetFiles(_invoicesFolderPath, "*.enc");
 
         List<BillingInvoice> validInvoices = [];
 
@@ -59,7 +59,7 @@ class PreviousInvoicesService
             Directory.CreateDirectory(_invoicesFolderPath);
         }
 
-        string[] invoiceFiles = Directory.GetFiles(_invoicesFolderPath, "*.json");
+        string[] invoiceFiles = Directory.GetFiles(_invoicesFolderPath, "*.enc");
 
         List<int> validCounts = [];
 
@@ -81,16 +81,19 @@ class PreviousInvoicesService
 
     private BillingInvoice? LoadInvoiceFromFile(string filePath)
     {
+        string tempJsonFile = Path.ChangeExtension(filePath, ".tmp");
+
         try
         {
-            if (!File.Exists(filePath))
-            {
-                return null;
-            }
+            _encryptionService.DecryptFile(filePath, tempJsonFile);
+            string json = File.ReadAllText(tempJsonFile);
 
-            string jsonContent = File.ReadAllText(filePath);
+            string encryptedContent = File.ReadAllText(filePath);
 
-            var invoice = JsonSerializer.Deserialize<BillingInvoice>(jsonContent);
+            // decrypt before deserializing
+            string decryptedJson = _encryptionService.Decrypt(encryptedContent);
+
+            var invoice = JsonSerializer.Deserialize<BillingInvoice>(decryptedJson);
 
             if (invoice is null)
             {
@@ -103,6 +106,13 @@ class PreviousInvoicesService
         {
             LogError($"Failed to load invoice from: {filePath}. Error: {ex.Message}");
             return null;
+        }
+        finally
+        {
+            if (File.Exists(tempJsonFile))
+            {
+                File.Delete(tempJsonFile);
+            }
         }
     }
 
