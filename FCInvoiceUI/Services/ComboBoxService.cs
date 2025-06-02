@@ -8,6 +8,7 @@ namespace FCInvoiceUI.Services;
 public class ComboBoxFormatService
 {
     private readonly string _invoicesFolderPath = @"C:\Users\cfowl\source\repos\FCInvoice\FCInvoiceUI\Resources\Data\";
+    private readonly EncryptionService _encryptionService = new();
 
     public ObservableCollection<BillingInvoice> LoadPreviousInvoices()
     {
@@ -18,13 +19,17 @@ public class ComboBoxFormatService
             return invoices;
         }
 
-        string[] invoiceFiles = Directory.GetFiles(_invoicesFolderPath, "*.json");
+        string[] invoiceFiles = Directory.GetFiles(_invoicesFolderPath, "*.enc");
 
         foreach (var file in invoiceFiles)
         {
+            string tempJsonFile = Path.ChangeExtension(file, ".tmp");
+
             try
             {
-                string json = File.ReadAllText(file);
+                _encryptionService.DecryptFile(file, tempJsonFile);
+
+                string json = File.ReadAllText(tempJsonFile);
                 var invoice = JsonSerializer.Deserialize<BillingInvoice>(json);
 
                 if (invoice is not null)
@@ -34,10 +39,17 @@ public class ComboBoxFormatService
             }
             catch
             {
-                Console.WriteLine("File unreadable");
-                continue;
+                Console.WriteLine($"File unreadable: {file}");
+            }
+            finally
+            {
+                if (File.Exists(tempJsonFile))
+                {
+                    File.Delete(tempJsonFile);
+                }
             }
         }
-        return [..invoices.OrderByDescending(i => i.InvoiceNumber)];
+
+        return [.. invoices.OrderByDescending(i => i.InvoiceNumber)];
     }
 }

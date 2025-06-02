@@ -1,5 +1,4 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -17,6 +16,37 @@ public class EncryptionService
             SaveKeyAndIV(key, iv, _keyFilePath);
         }
     }
+
+    public void EncryptFile(string inputFile, string outputFile)
+    {
+        var (key, iv) = LoadKeyAndIV();
+
+        using Aes aes = Aes.Create();
+        aes.Key = key;
+        aes.IV = iv;
+
+        using FileStream fsInput = new(inputFile, FileMode.Open, FileAccess.Read);
+        using FileStream fsEncrypted = new(outputFile, FileMode.Create, FileAccess.Write);
+        using CryptoStream cs = new(fsEncrypted, aes.CreateEncryptor(), CryptoStreamMode.Write);
+
+        fsInput.CopyTo(cs);
+    }
+
+    public void DecryptFile(string inputFile, string outputFile)
+    {
+        var (key, iv) = LoadKeyAndIV();
+
+        using Aes aes = Aes.Create();
+        aes.Key = key;
+        aes.IV = iv;
+
+        using FileStream fsEncrypted = new(inputFile, FileMode.Open, FileAccess.Read);
+        using FileStream fsDecrypted = new(outputFile, FileMode.Create, FileAccess.Write);
+        using CryptoStream cs = new(fsEncrypted, aes.CreateDecryptor(), CryptoStreamMode.Read);
+
+        cs.CopyTo(fsDecrypted);
+    }
+
     public string Encrypt(string plainText)
     {
         try

@@ -16,9 +16,9 @@ class InvoiceNumberGeneratorService
             return $"{currentYear}001";
         }
 
-        // get all the current files in the data folder, remove .json ext,
+        // get all the current files in the data folder, remove .enc ext,
         // gets type of string as a null check, make sure they fit the yyyyxxx format, make them a list
-        var invoiceFiles = Directory.GetFiles(c_FolderPath, "*.json")
+        var invoiceFiles = Directory.GetFiles(c_FolderPath, "*.enc")
             .Select(Path.GetFileNameWithoutExtension)
             .OfType<string>()
             .Where(name => name is not null && name.Length == 7 && name.StartsWith(currentYear.ToString()))

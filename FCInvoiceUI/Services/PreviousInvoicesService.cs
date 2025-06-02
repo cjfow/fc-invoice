@@ -18,7 +18,6 @@ class PreviousInvoicesService
         }
 
         string[] invoiceFiles = Directory.GetFiles(_invoicesFolderPath, "*.enc");
-
         List<BillingInvoice> validInvoices = [];
 
         foreach (var file in invoiceFiles)
@@ -61,7 +60,6 @@ class PreviousInvoicesService
         }
 
         string[] invoiceFiles = Directory.GetFiles(_invoicesFolderPath, "*.enc");
-
         List<int> validCounts = [];
 
         foreach (var file in invoiceFiles)
@@ -89,12 +87,7 @@ class PreviousInvoicesService
             _encryptionService.DecryptFile(filePath, tempJsonFile);
             string json = File.ReadAllText(tempJsonFile);
 
-            string encryptedContent = File.ReadAllText(filePath);
-
-            // decrypt before deserializing
-            string decryptedJson = _encryptionService.Decrypt(encryptedContent);
-
-            var invoice = JsonSerializer.Deserialize<BillingInvoice>(decryptedJson);
+            var invoice = JsonSerializer.Deserialize<BillingInvoice>(json);
 
             if (invoice is null)
             {

@@ -1,9 +1,6 @@
 ﻿using FCInvoiceUI.Models;
-using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
-using System.Threading.Tasks;
 
 namespace FCInvoiceUI.Services;
 
@@ -25,33 +22,51 @@ public class JsonInvoiceStorageService : IInvoiceStorageService
             Directory.CreateDirectory(_baseDirectory);
         }
 
-        string fileName = Path.Combine(_baseDirectory, $"{invoice.InvoiceNumber}.enc");
+        string tempJsonFile = Path.Combine(_baseDirectory, $"{invoice.InvoiceNumber}.tmp");
+        string encryptedFile = Path.Combine(_baseDirectory, $"{invoice.InvoiceNumber}.enc");
 
-        string json = JsonSerializer.Serialize(invoice, _cachedJsonSerializerOptions);
-        string encryptedJson = _encryptionService.Encrypt(json);
-        await File.WriteAllTextAsync(fileName, encryptedJson);
+        try
+        {
+            string json = JsonSerializer.Serialize(invoice, _cachedJsonSerializerOptions);
+            await File.WriteAllTextAsync(tempJsonFile, json);
+            _encryptionService.EncryptFile(tempJsonFile, encryptedFile);
+        }
+        finally
+        {
+            if (File.Exists(tempJsonFile))
+            {
+                File.Delete(tempJsonFile);
+            }
+        }
     }
 
     public async Task<BillingInvoice?> LoadInvoiceAsync(string invoiceNumber)
     {
-        string fileName = Path.Combine(_baseDirectory, $"{invoiceNumber}.enc");
+        string encryptedFile = Path.Combine(_baseDirectory, $"{invoiceNumber}.enc");
+        string tempJsonFile = Path.Combine(_baseDirectory, $"{invoiceNumber}.tmp");
 
-        if (!File.Exists(fileName))
+        if (!File.Exists(encryptedFile))
         {
             return null;
         }
 
         try
         {
-            string encryptedJson = await File.ReadAllTextAsync(fileName);
-            string decryptedJson = _encryptionService.Decrypt(encryptedJson);
-
-            return JsonSerializer.Deserialize<BillingInvoice>(decryptedJson);
+            _encryptionService.DecryptFile(encryptedFile, tempJsonFile);
+            string json = await File.ReadAllTextAsync(tempJsonFile);
+            return JsonSerializer.Deserialize<BillingInvoice>(json);
         }
         catch (Exception ex)
         {
             Console.WriteLine($"Failed to load invoice {invoiceNumber}: {ex.Message}");
             return null;
+        }
+        finally
+        {
+            if (File.Exists(tempJsonFile))
+            {
+                File.Delete(tempJsonFile);
+            }
         }
     }
 
@@ -60,30 +75,40 @@ public class JsonInvoiceStorageService : IInvoiceStorageService
         Directory.CreateDirectory(_baseDirectory);
         List<BillingInvoice> invoices = [];
 
-        foreach (string file in Directory.GetFiles(_baseDirectory, "*.enc"))
+        foreach (string encryptedFile in Directory.GetFiles(_baseDirectory, "*.enc"))
         {
+            string fileName = Path.GetFileNameWithoutExtension(encryptedFile);
+            string tempJsonFile = Path.Combine(_baseDirectory, $"{fileName}.tmp");
+
             try
             {
-                string encryptedJson = await File.ReadAllTextAsync(file);
-                string decryptedJson = _encryptionService.Decrypt(encryptedJson);
+                _encryptionService.DecryptFile(encryptedFile, tempJsonFile);
+                string json = await File.ReadAllTextAsync(tempJsonFile);
 
-                if (JsonSerializer.Deserialize<BillingInvoice>(decryptedJson) is BillingInvoice invoice)
+                if (JsonSerializer.Deserialize<BillingInvoice>(json) is BillingInvoice invoice)
                 {
                     invoices.Add(invoice);
                 }
                 else
                 {
-                    Console.WriteLine($"File deserialized to null: {file}");
+                    Console.WriteLine($"File deserialized to null: {encryptedFile}");
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"File unreadable: {file}");
+                Console.WriteLine($"File unreadable: {encryptedFile}");
                 Console.WriteLine($"Reason: {ex.Message}");
+            }
+            finally
+            {
+                if (File.Exists(tempJsonFile))
+                {
+                    File.Delete(tempJsonFile);
+                }
             }
         }
 
-        return invoices;
+        return invoices.OrderByDescending(i => i.InvoiceNumber);
     }
 
     public async Task DeleteInvoiceAsync(string invoiceNumber)
