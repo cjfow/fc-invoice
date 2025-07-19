@@ -24,17 +24,17 @@ public class ComboBoxFormatService
             return invoices;
         }
 
-        string[] invoiceFiles = Directory.GetFiles(_invoicesFolderPath, "*.enc");
+        var invoiceFiles = Directory.GetFiles(_invoicesFolderPath, "*.enc");
 
         foreach (var file in invoiceFiles)
         {
-            string tempJsonFile = Path.ChangeExtension(file, ".tmp");
+            var tempJsonFile = Path.ChangeExtension(file, ".tmp");
 
             try
             {
                 _encryptionService.DecryptFile(file, tempJsonFile);
 
-                string json = File.ReadAllText(tempJsonFile);
+                var json = File.ReadAllText(tempJsonFile);
                 var invoice = JsonSerializer.Deserialize<BillingInvoice>(json);
 
                 if (invoice is not null)

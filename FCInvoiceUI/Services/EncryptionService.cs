@@ -80,7 +80,7 @@ public class EncryptionService
         try
         {
             var (key, iv) = LoadKeyAndIV();
-            byte[] buffer = Convert.FromBase64String(cipherText);
+            var buffer = Convert.FromBase64String(cipherText);
 
             using Aes aes = Aes.Create();
             aes.Key = key;
@@ -109,21 +109,21 @@ public class EncryptionService
 
     private static void SaveKeyAndIV(byte[] key, byte[] iv, string filePath)
     {
-        byte[] combined = new byte[key.Length + iv.Length];
+        var combined = new byte[key.Length + iv.Length];
         Buffer.BlockCopy(key, 0, combined, 0, key.Length);
         Buffer.BlockCopy(iv, 0, combined, key.Length, iv.Length);
 
-        byte[] encrypted = ProtectedData.Protect(combined, null, DataProtectionScope.CurrentUser);
+        var encrypted = ProtectedData.Protect(combined, null, DataProtectionScope.CurrentUser);
         File.WriteAllBytes(filePath, encrypted);
     }
 
     private (byte[] Key, byte[] IV) LoadKeyAndIV()
     {
-        byte[] encrypted = File.ReadAllBytes(_keyFilePath);
-        byte[] combined = ProtectedData.Unprotect(encrypted, null, DataProtectionScope.CurrentUser);
+        var encrypted = File.ReadAllBytes(_keyFilePath);
+        var combined = ProtectedData.Unprotect(encrypted, null, DataProtectionScope.CurrentUser);
 
-        byte[] key = new byte[32];
-        byte[] iv = new byte[16];
+        var key = new byte[32];
+        var iv = new byte[16];
         Buffer.BlockCopy(combined, 0, key, 0, 32);
         Buffer.BlockCopy(combined, 32, iv, 0, 16);
 

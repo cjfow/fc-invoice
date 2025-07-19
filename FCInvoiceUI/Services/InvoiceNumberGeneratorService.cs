@@ -8,7 +8,7 @@ class InvoiceNumberGeneratorService
 
     public static string GetNextInvoiceNumber()
     {
-        int currentYear = DateTime.Today.Year;
+        var currentYear = DateTime.Today.Year;
 
         if (!Directory.Exists(s_folderPath))
         {
@@ -24,18 +24,18 @@ class InvoiceNumberGeneratorService
             .Where(name => name is not null && name.Length == 7 && name.StartsWith(currentYear.ToString()))
             .ToList();
 
-        List<int> invoiceNumbers = [];
+        var invoiceNumbers = new List<int>();
 
         foreach (var name in invoiceFiles)
         {
-            string numberPart = name[4..];
-            if (int.TryParse(numberPart, out int number))
+            var numberPart = name[4..];
+            if (int.TryParse(numberPart, out var number))
             {
                 invoiceNumbers.Add(number);
             }
         }
 
-        int nextNumber = (invoiceNumbers.Count != 0 ? invoiceNumbers.Max() : 0) + 1;
+        var nextNumber = (invoiceNumbers.Count != 0 ? invoiceNumbers.Max() : 0) + 1;
         return $"{currentYear}{nextNumber:D3}";
     }
 }

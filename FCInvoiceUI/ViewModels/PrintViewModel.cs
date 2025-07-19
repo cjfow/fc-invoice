@@ -44,14 +44,14 @@ public partial class PrintViewModel(BillingInvoice invoice) : ObservableObject
             try
             {
                 var capabilities = printDialog.PrintQueue.GetPrintCapabilities(printDialog.PrintTicket);
-                double printableWidth = capabilities.PageImageableArea.ExtentWidth;
-                double printableHeight = capabilities.PageImageableArea.ExtentHeight;
+                var printableWidth = capabilities.PageImageableArea.ExtentWidth;
+                var printableHeight = capabilities.PageImageableArea.ExtentHeight;
 
                 paperVisual.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
                 paperVisual.Arrange(new Rect(new Point(0, 0), paperVisual.DesiredSize));
                 paperVisual.UpdateLayout();
 
-                double scale = Math.Min(printableWidth / paperVisual.DesiredSize.Width, printableHeight / paperVisual.DesiredSize.Height);
+                var scale = Math.Min(printableWidth / paperVisual.DesiredSize.Width, printableHeight / paperVisual.DesiredSize.Height);
 
                 var originalTransform = paperVisual.LayoutTransform;
                 paperVisual.LayoutTransform = new ScaleTransform(scale, scale);

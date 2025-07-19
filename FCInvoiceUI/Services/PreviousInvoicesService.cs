@@ -12,7 +12,7 @@ class PreviousInvoicesService
 
     public PreviousInvoicesService()
     {
-        string basePath = Path.Combine(AppContext.BaseDirectory, "Resources", "Data");
+        var basePath = Path.Combine(AppContext.BaseDirectory, "Resources", "Data");
         _invoicesFolderPath = basePath;
         _errorLogPath = Path.Combine(basePath, "InvoiceLoadErrors.txt");
     }
@@ -24,7 +24,7 @@ class PreviousInvoicesService
             return [];
         }
 
-        string[] invoiceFiles = Directory.GetFiles(_invoicesFolderPath, "*.enc");
+        var invoiceFiles = Directory.GetFiles(_invoicesFolderPath, "*.enc");
         List<BillingInvoice> validInvoices = [];
 
         foreach (var file in invoiceFiles)
@@ -47,7 +47,7 @@ class PreviousInvoicesService
             return null;
         }
 
-        string filePath = Path.Combine(_invoicesFolderPath, $"{invoiceNumber}.enc");
+        var filePath = Path.Combine(_invoicesFolderPath, $"{invoiceNumber}.enc");
 
         if (!File.Exists(filePath))
         {
@@ -59,19 +59,19 @@ class PreviousInvoicesService
 
     public string GetNextInvoiceNumber()
     {
-        int currentYear = DateTime.Today.Year;
+        var currentYear = DateTime.Today.Year;
 
         if (!Directory.Exists(_invoicesFolderPath))
         {
             Directory.CreateDirectory(_invoicesFolderPath);
         }
 
-        string[] invoiceFiles = Directory.GetFiles(_invoicesFolderPath, "*.enc");
-        List<int> validCounts = [];
+        var invoiceFiles = Directory.GetFiles(_invoicesFolderPath, "*.enc");
+        var validCounts = new List<int>();
 
         foreach (var file in invoiceFiles)
         {
-            string name = Path.GetFileNameWithoutExtension(file);
+            var name = Path.GetFileNameWithoutExtension(file);
 
             if (IsValidInvoiceNumber(name))
             {
@@ -80,19 +80,19 @@ class PreviousInvoicesService
             }
         }
 
-        int nextCount = validCounts.Count != 0 ? validCounts.Max() + 1 : 1;
+        var nextCount = validCounts.Count != 0 ? validCounts.Max() + 1 : 1;
 
         return $"{currentYear}{nextCount:000}";
     }
 
     private BillingInvoice? LoadInvoiceFromFile(string filePath)
     {
-        string tempJsonFile = Path.ChangeExtension(filePath, ".tmp");
+        var tempJsonFile = Path.ChangeExtension(filePath, ".tmp");
 
         try
         {
             _encryptionService.DecryptFile(filePath, tempJsonFile);
-            string json = File.ReadAllText(tempJsonFile);
+            var json = File.ReadAllText(tempJsonFile);
 
             var invoice = JsonSerializer.Deserialize<BillingInvoice>(json);
 
@@ -132,7 +132,7 @@ class PreviousInvoicesService
     {
         try
         {
-            string logEntry = $"{DateTime.Now:g} - {message}{Environment.NewLine}";
+            var logEntry = $"{DateTime.Now:g} - {message}{Environment.NewLine}";
             File.AppendAllText(_errorLogPath, logEntry);
         }
         catch

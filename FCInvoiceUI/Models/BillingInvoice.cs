@@ -12,9 +12,14 @@ public class BillingInvoice : INotifyPropertyChanged
         get
         {
             if (IsCurrentInvoice)
+            {
                 return InvoiceNumber is not null ? $"Current Invoice ({InvoiceNumber})" : "Current Invoice";
+            }
+
             else
+            {
                 return InvoiceNumber ?? "Unnamed Invoice";
+            }
         }
     }
 
