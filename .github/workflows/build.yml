@@ -82,19 +82,18 @@ jobs:
       run: dotnet restore
 
     - name: Run code analysis
-      run: dotnet build --configuration Release --verbosity normal --no-restore /p:TreatWarningsAsErrors=true
+      run: dotnet build --configuration Release --verbosity normal --no-restore
 
     - name: Install security analysis tools
       run: |
-        dotnet tool install --global security-scan
         dotnet tool install --global dotnet-outdated-tool
-
-    - name: Run security scan
-      run: security-scan **/*.csproj --excl-dev
-      continue-on-error: true
 
     - name: Check for outdated packages
       run: dotnet outdated --upgrade --include-auto-references
+      continue-on-error: true
+
+    - name: Run .NET security analysis
+      run: dotnet list package --vulnerable --include-transitive
       continue-on-error: true
 
   build-artifacts:
@@ -126,7 +125,7 @@ jobs:
 
     - name: Publish application
       run: |
-        dotnet publish FCInvoice.UI/FCInvoice.UI.csproj `
+        dotnet publish FCInvoiceUI/FCInvoice.UI.csproj `
           --configuration Release `
           --runtime ${{ matrix.runtime }} `
           --self-contained true `

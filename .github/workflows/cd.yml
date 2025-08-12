@@ -108,7 +108,7 @@ jobs:
 
     - name: Build and publish
       run: |
-        dotnet publish FCInvoice.UI/FCInvoice.UI.csproj `
+        dotnet publish FCInvoiceUI/FCInvoice.UI.csproj `
           --configuration Release `
           --runtime ${{ matrix.runtime }} `
           --self-contained true `
