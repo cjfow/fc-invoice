@@ -6,6 +6,12 @@ on:
   pull_request:
     branches: [ master ]
 
+permissions:
+  contents: read
+  actions: read
+  checks: write
+  pull-requests: write
+
 env:
   DOTNET_VERSION: '9.0.x'
   DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
@@ -131,9 +137,7 @@ jobs:
           --self-contained true `
           --output publish/${{ matrix.runtime }} `
           --verbosity minimal `
-          -p:PublishSingleFile=true `
-          -p:PublishTrimmed=true `
-          -p:TrimMode=partial
+          -p:PublishSingleFile=true
 
     - name: Create release package
       run: |

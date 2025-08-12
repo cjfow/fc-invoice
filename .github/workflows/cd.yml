@@ -15,6 +15,11 @@ on:
         type: boolean
         default: false
 
+permissions:
+  contents: write
+  actions: read
+  checks: write
+
 env:
   DOTNET_VERSION: '9.0.x'
   DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
@@ -115,8 +120,6 @@ jobs:
           --output "release/${{ matrix.runtime }}" `
           --verbosity minimal `
           -p:PublishSingleFile=true `
-          -p:PublishTrimmed=true `
-          -p:TrimMode=partial `
           -p:DebugType=None `
           -p:DebugSymbols=false
 

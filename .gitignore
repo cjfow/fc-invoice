@@ -272,6 +272,7 @@ temp_*_ai
 tmp_*_ai
 *_assistant_*
 .anthropic/
+CLAUDE.md
 
 # Application specific
 Resources/Data/KeyIV.dat
