@@ -2,7 +2,7 @@
 using System.Data;
 using System.Windows;
 
-namespace FCInvoiceUI;
+namespace FCInvoice.UI;
 
 /// <summary>
 /// Interaction logic for App.xaml

@@ -1,0 +1,157 @@
+name: CI Build
+
+on:
+  push:
+    branches: [ master, develop ]
+  pull_request:
+    branches: [ master ]
+
+env:
+  DOTNET_VERSION: '9.0.x'
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+  DOTNET_NOLOGO: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+
+jobs:
+  build-and-test:
+    name: Build and Test
+    runs-on: windows-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0 # Shallow clones should be disabled for better analysis
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: ${{ env.DOTNET_VERSION }}
+
+    - name: Cache NuGet packages
+      uses: actions/cache@v4
+      with:
+        path: ~/.nuget/packages
+        key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.lock.json', '**/*.csproj') }}
+        restore-keys: |
+          ${{ runner.os }}-nuget-
+
+    - name: Restore dependencies
+      run: dotnet restore
+
+    - name: Build solution
+      run: dotnet build --configuration Release --no-restore --verbosity normal
+
+    - name: Run tests
+      run: dotnet test --configuration Release --no-build --verbosity normal --logger "trx;LogFileName=test-results.trx" --collect:"XPlat Code Coverage"
+
+    - name: Upload test results
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: test-results
+        path: |
+          **/TestResults/test-results.trx
+          **/TestResults/**/coverage.cobertura.xml
+
+    - name: Publish test results
+      uses: dorny/test-reporter@v1
+      if: always()
+      with:
+        name: Test Results
+        path: '**/TestResults/test-results.trx'
+        reporter: dotnet-trx
+
+  code-quality:
+    name: Code Quality Analysis
+    runs-on: windows-latest
+    needs: build-and-test
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: ${{ env.DOTNET_VERSION }}
+
+    - name: Restore dependencies
+      run: dotnet restore
+
+    - name: Run code analysis
+      run: dotnet build --configuration Release --verbosity normal --no-restore /p:TreatWarningsAsErrors=true
+
+    - name: Install security analysis tools
+      run: |
+        dotnet tool install --global security-scan
+        dotnet tool install --global dotnet-outdated-tool
+
+    - name: Run security scan
+      run: security-scan **/*.csproj --excl-dev
+      continue-on-error: true
+
+    - name: Check for outdated packages
+      run: dotnet outdated --upgrade --include-auto-references
+      continue-on-error: true
+
+  build-artifacts:
+    name: Build Release Artifacts
+    runs-on: windows-latest
+    needs: [build-and-test, code-quality]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    
+    strategy:
+      matrix:
+        runtime: [win-x64, win-arm64]
+        include:
+          - runtime: win-x64
+            artifact-name: FCInvoice-win-x64
+          - runtime: win-arm64
+            artifact-name: FCInvoice-win-arm64
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: ${{ env.DOTNET_VERSION }}
+
+    - name: Restore dependencies
+      run: dotnet restore
+
+    - name: Publish application
+      run: |
+        dotnet publish FCInvoice.UI/FCInvoice.UI.csproj `
+          --configuration Release `
+          --runtime ${{ matrix.runtime }} `
+          --self-contained true `
+          --output publish/${{ matrix.runtime }} `
+          --verbosity minimal `
+          -p:PublishSingleFile=true `
+          -p:PublishTrimmed=true `
+          -p:TrimMode=partial
+
+    - name: Create release package
+      run: |
+        $version = (Get-Date -Format "yyyy.MM.dd") + "." + $env:GITHUB_RUN_NUMBER
+        Compress-Archive -Path "publish/${{ matrix.runtime }}/*" -DestinationPath "${{ matrix.artifact-name }}-v$version.zip"
+        echo "RELEASE_VERSION=v$version" >> $env:GITHUB_ENV
+
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ matrix.artifact-name }}
+        path: ${{ matrix.artifact-name }}-*.zip
+        retention-days: 30
+
+    - name: Upload release artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: release-artifacts
+        path: "*.zip"
+        retention-days: 90

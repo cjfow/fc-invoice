@@ -1,5 +1,6 @@
-using FCInvoiceUI.Models;
-using FCInvoiceUI.ViewModels;
+using FCInvoice.Core.Models;
+using FCInvoice.UI.ViewModels;
+using FCInvoiceTests.Mocks;
 
 namespace FCInvoiceTests;
 
@@ -24,7 +25,8 @@ public class PrintViewModelTests
             Rate = 10
         });
 
-        PrintViewModel viewModel = new(invoice);
+        var mockStorageService = new MockInvoiceStorageService();
+        PrintViewModel viewModel = new(invoice, mockStorageService);
 
         Assert.AreEqual("Test Customer", viewModel.BillTo);
         Assert.AreEqual("12-345", viewModel.ProjectNumber);

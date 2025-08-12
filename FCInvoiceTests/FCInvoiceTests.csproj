@@ -13,7 +13,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\FCInvoiceUI\FCInvoiceUI.csproj" />
+    <ProjectReference Include="..\FCInvoiceUI\FCInvoice.UI.csproj" />
+    <ProjectReference Include="..\FCInvoice.Core\FCInvoice.Core.csproj" />
   </ItemGroup>
 
   <ItemGroup>

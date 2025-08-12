@@ -1,60 +1,42 @@
-﻿using FCInvoiceUI.Models;
+﻿using FCInvoice.Core.Interfaces;
+using FCInvoice.Core.Models;
+using FCInvoice.Core.Services;
 using System.Collections.ObjectModel;
-using System.IO;
-using System.Text.Json;
 
-namespace FCInvoiceUI.Services;
+namespace FCInvoice.UI.Services;
 
-public class ComboBoxFormatService
+/// <summary>
+/// Service for loading invoices formatted for ComboBox display
+/// </summary>
+public class ComboBoxFormatService(IInvoiceStorageService storageService)
 {
-    private readonly string _invoicesFolderPath;
-    private readonly EncryptionService _encryptionService = new();
+    private readonly IInvoiceStorageService _storageService = storageService;
 
-    public ComboBoxFormatService()
+    public ComboBoxFormatService() : this(new JsonInvoiceStorageService()) { }
+
+    /// <summary>
+    /// Loads all previous invoices for ComboBox display
+    /// </summary>
+    /// <returns>Observable collection of invoices ordered by invoice number descending</returns>
+    /// 
+    public virtual async Task<ObservableCollection<BillingInvoice>> LoadPreviousInvoicesAsync()
     {
-        _invoicesFolderPath = Path.Combine(AppContext.BaseDirectory, "Resources", "Data");
-    }
-
-    public ObservableCollection<BillingInvoice> LoadPreviousInvoices()
-    {
-        ObservableCollection<BillingInvoice> invoices = [];
-
-        if (!Directory.Exists(_invoicesFolderPath))
+        try
         {
-            return invoices;
+            var invoices = await _storageService.LoadAllInvoicesAsync();
+            return new ObservableCollection<BillingInvoice>(invoices);
         }
-
-        var invoiceFiles = Directory.GetFiles(_invoicesFolderPath, "*.enc");
-
-        foreach (var file in invoiceFiles)
+        catch (Exception ex)
         {
-            var tempJsonFile = Path.ChangeExtension(file, ".tmp");
-
-            try
-            {
-                _encryptionService.DecryptFile(file, tempJsonFile);
-
-                var json = File.ReadAllText(tempJsonFile);
-                var invoice = JsonSerializer.Deserialize<BillingInvoice>(json);
-
-                if (invoice is not null)
-                {
-                    invoices.Add(invoice);
-                }
-            }
-            catch
-            {
-                Console.WriteLine($"File unreadable: {file}");
-            }
-            finally
-            {
-                if (File.Exists(tempJsonFile))
-                {
-                    File.Delete(tempJsonFile);
-                }
-            }
+            Console.WriteLine($"Failed to load previous invoices: {ex.Message}");
+            return [];
         }
-
-        return [.. invoices.OrderByDescending(i => i.InvoiceNumber)];
     }
+    
+    /// <summary>
+    /// Synchronous version for backward compatibility - prefer async version
+    /// </summary>
+    /// <returns>Observable collection of invoices</returns>
+    public virtual ObservableCollection<BillingInvoice> LoadPreviousInvoices() =>
+        LoadPreviousInvoicesAsync().GetAwaiter().GetResult();
 }

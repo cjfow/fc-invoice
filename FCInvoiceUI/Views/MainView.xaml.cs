@@ -1,7 +1,7 @@
 ﻿using System.Windows;
-using FCInvoiceUI.ViewModels;
+using FCInvoice.UI.ViewModels;
 
-namespace FCInvoiceUI.Views;
+namespace FCInvoice.UI.Views;
 
 /// <summary>
 /// Interaction logic for MainView.xaml

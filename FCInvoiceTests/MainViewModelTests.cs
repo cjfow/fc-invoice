@@ -1,5 +1,6 @@
-using FCInvoiceUI.Models;
-using FCInvoiceUI.ViewModels;
+using FCInvoice.Core.Models;
+using FCInvoice.UI.ViewModels;
+using FCInvoiceTests.TestHelpers;
 
 namespace FCInvoiceTests;
 
@@ -9,7 +10,7 @@ public class MainViewModelTests
     [TestMethod]
     public void Constructor_ShouldInitializeInvoiceWithDefaults()
     {
-        MainViewModel viewModel = new();
+        var viewModel = ViewModelTestHelper.CreateMainViewModelForTesting();
 
         Assert.IsTrue(viewModel.Invoice.IsCurrentInvoice);
         Assert.IsNotNull(viewModel.Invoice.InvoiceNumber);
@@ -21,7 +22,7 @@ public class MainViewModelTests
     [TestMethod]
     public void BillTo_Setter_ShouldUpdateInvoiceBillTo()
     {
-        MainViewModel viewModel = NewMethod();
+        var viewModel = ViewModelTestHelper.CreateMainViewModelForTesting();
         string newBillTo = "New Customer";
 
         viewModel.BillTo = newBillTo;
@@ -29,15 +30,10 @@ public class MainViewModelTests
         Assert.AreEqual(newBillTo, viewModel.Invoice.BillTo);
     }
 
-    private static MainViewModel NewMethod()
-    {
-        return new MainViewModel();
-    }
-
     [TestMethod]
     public void ProjectNumber_Setter_ShouldUpdateInvoiceProjectNumber()
     {
-        MainViewModel viewModel = new();
+        var viewModel = ViewModelTestHelper.CreateMainViewModelForTesting();
         string newProjectNumber = "24-999";
 
         viewModel.ProjectNumber = newProjectNumber;
@@ -48,7 +44,7 @@ public class MainViewModelTests
     [TestMethod]
     public void SelectedDate_Setter_ShouldUpdateInvoiceSelectedDate()
     {
-        MainViewModel viewModel = new();
+        var viewModel = ViewModelTestHelper.CreateMainViewModelForTesting();
         DateTime newDate = new(2025, 5, 1);
 
         viewModel.SelectedDate = newDate;
@@ -59,7 +55,7 @@ public class MainViewModelTests
     [TestMethod]
     public void InvoiceNumber_Setter_ShouldUpdateInvoiceInvoiceNumber()
     {
-        MainViewModel viewModel = new();
+        var viewModel = ViewModelTestHelper.CreateMainViewModelForTesting();
         string newInvoiceNumber = "2025002";
 
         viewModel.InvoiceNumber = newInvoiceNumber;
@@ -70,10 +66,8 @@ public class MainViewModelTests
     [TestMethod]
     public void SelectingSameInvoice_ShouldRestoreOriginalInvoice()
     {
-        MainViewModel viewModel = new()
-        {
-            BillTo = "Original BillTo"
-        };
+        var viewModel = ViewModelTestHelper.CreateMainViewModelForTesting();
+        viewModel.BillTo = "Original BillTo";
         viewModel.CacheCurrentInvoice();
 
         viewModel.BillTo = "Modified BillTo";
@@ -88,7 +82,7 @@ public class MainViewModelTests
     [TestMethod]
     public void SelectingDifferentInvoice_ShouldCopyInvoice()
     {
-        MainViewModel viewModel = new();
+        var viewModel = ViewModelTestHelper.CreateMainViewModelForTesting();
         BillingInvoice newInvoice = new()
         {
             BillTo = "Different Client",

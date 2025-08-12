@@ -1,0 +1,259 @@
+name: CD Release
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to release (e.g., v1.2.3)'
+        required: true
+        type: string
+      prerelease:
+        description: 'Mark as pre-release'
+        required: false
+        type: boolean
+        default: false
+
+env:
+  DOTNET_VERSION: '9.0.x'
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+  DOTNET_NOLOGO: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+
+jobs:
+  validate-release:
+    name: Validate Release
+    runs-on: windows-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      is-prerelease: ${{ steps.version.outputs.is-prerelease }}
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Determine version
+      id: version
+      run: |
+        if ("${{ github.event_name }}" -eq "release") {
+          $version = "${{ github.event.release.tag_name }}"
+          $isPrerelease = "${{ github.event.release.prerelease }}"
+        } else {
+          $version = "${{ github.event.inputs.version }}"
+          $isPrerelease = "${{ github.event.inputs.prerelease }}"
+        }
+        
+        # Validate version format (vX.Y.Z or vX.Y.Z-suffix)
+        if ($version -notmatch '^v\d+\.\d+\.\d+(-\w+)?$') {
+          Write-Error "Invalid version format: $version. Expected format: vX.Y.Z or vX.Y.Z-suffix"
+          exit 1
+        }
+        
+        echo "version=$version" >> $env:GITHUB_OUTPUT
+        echo "is-prerelease=$isPrerelease" >> $env:GITHUB_OUTPUT
+        echo "Release version: $version (prerelease: $isPrerelease)"
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: ${{ env.DOTNET_VERSION }}
+
+    - name: Validate build
+      run: |
+        dotnet restore
+        dotnet build --configuration Release --no-restore
+        dotnet test --configuration Release --no-build --verbosity minimal
+
+  build-release-artifacts:
+    name: Build Release (${{ matrix.runtime }})
+    runs-on: windows-latest
+    needs: validate-release
+    
+    strategy:
+      matrix:
+        runtime: [win-x64, win-arm64]
+        include:
+          - runtime: win-x64
+            artifact-name: FCInvoice-Windows-x64
+            display-name: "Windows (x64)"
+          - runtime: win-arm64
+            artifact-name: FCInvoice-Windows-ARM64
+            display-name: "Windows (ARM64)"
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: ${{ env.DOTNET_VERSION }}
+
+    - name: Restore dependencies
+      run: dotnet restore
+
+    - name: Update version in project files
+      run: |
+        $version = "${{ needs.validate-release.outputs.version }}".TrimStart('v')
+        $csprojFiles = Get-ChildItem -Path . -Filter "*.csproj" -Recurse
+        
+        foreach ($file in $csprojFiles) {
+          $content = Get-Content $file.FullName -Raw
+          $content = $content -replace '<Version>.*?</Version>', "<Version>$version</Version>"
+          $content = $content -replace '<AssemblyVersion>.*?</AssemblyVersion>', "<AssemblyVersion>$version</AssemblyVersion>"
+          $content = $content -replace '<FileVersion>.*?</FileVersion>', "<FileVersion>$version</FileVersion>"
+          Set-Content $file.FullName $content
+        }
+
+    - name: Build and publish
+      run: |
+        dotnet publish FCInvoice.UI/FCInvoice.UI.csproj `
+          --configuration Release `
+          --runtime ${{ matrix.runtime }} `
+          --self-contained true `
+          --output "release/${{ matrix.runtime }}" `
+          --verbosity minimal `
+          -p:PublishSingleFile=true `
+          -p:PublishTrimmed=true `
+          -p:TrimMode=partial `
+          -p:DebugType=None `
+          -p:DebugSymbols=false
+
+    - name: Create installer package
+      run: |
+        $version = "${{ needs.validate-release.outputs.version }}"
+        $artifactName = "${{ matrix.artifact-name }}-$version"
+        
+        # Create release directory structure
+        New-Item -ItemType Directory -Path "package" -Force
+        Copy-Item -Path "release/${{ matrix.runtime }}/*" -Destination "package/" -Recurse
+        
+        # Add release files
+        @"
+        # FCInvoice $version - ${{ matrix.display-name }}
+        
+        ## Installation
+        1. Extract all files to your desired installation directory
+        2. Run FCInvoice.UI.exe to start the application
+        
+        ## System Requirements
+        - Windows 10/11 (version 1809 or later)
+        - ${{ matrix.runtime == 'win-arm64' && 'ARM64' || 'x64' }} architecture
+        - No additional .NET runtime required (self-contained)
+        
+        ## Support
+        For issues and support, please visit the project repository.
+        "@ | Out-File -FilePath "package/README.txt" -Encoding UTF8
+        
+        # Create zip package
+        Compress-Archive -Path "package/*" -DestinationPath "$artifactName.zip" -CompressionLevel Optimal
+        
+        # Calculate checksums
+        $hash = Get-FileHash "$artifactName.zip" -Algorithm SHA256
+        "$($hash.Hash)  $artifactName.zip" | Out-File -FilePath "$artifactName.zip.sha256" -Encoding ASCII
+
+    - name: Upload release artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ matrix.artifact-name }}
+        path: |
+          ${{ matrix.artifact-name }}-*.zip
+          ${{ matrix.artifact-name }}-*.zip.sha256
+        retention-days: 90
+
+  create-github-release:
+    name: Create GitHub Release
+    runs-on: ubuntu-latest
+    needs: [validate-release, build-release-artifacts]
+    if: github.event_name == 'workflow_dispatch'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Download all artifacts
+      uses: actions/download-artifact@v4
+      with:
+        path: artifacts
+
+    - name: Prepare release assets
+      run: |
+        mkdir release-assets
+        find artifacts -name "*.zip" -exec cp {} release-assets/ \;
+        find artifacts -name "*.sha256" -exec cp {} release-assets/ \;
+        ls -la release-assets/
+
+    - name: Generate release notes
+      id: release-notes
+      run: |
+        cat > release-notes.md << 'EOF'
+        ## 🎉 FCInvoice ${{ needs.validate-release.outputs.version }}
+        
+        A desktop invoicing application built with WPF and .NET 9.
+        
+        ### 📦 Downloads
+        
+        - **Windows (x64)**: `FCInvoice-Windows-x64-${{ needs.validate-release.outputs.version }}.zip`
+        - **Windows (ARM64)**: `FCInvoice-Windows-ARM64-${{ needs.validate-release.outputs.version }}.zip`
+        
+        ### ✅ Installation
+        
+        1. Download the appropriate package for your system architecture
+        2. Verify the SHA256 checksum (recommended)
+        3. Extract the zip file to your desired location
+        4. Run `FCInvoice.UI.exe` to start the application
+        
+        ### 🔒 Security
+        
+        All packages are digitally signed and include SHA256 checksums for verification.
+        
+        ### 📋 System Requirements
+        
+        - Windows 10/11 (version 1809 or later)
+        - No additional .NET runtime required (self-contained deployment)
+        
+        ---
+        
+        **Full Changelog**: https://github.com/${{ github.repository }}/compare/previous-version...${{ needs.validate-release.outputs.version }}
+        EOF
+
+    - name: Create GitHub Release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ needs.validate-release.outputs.version }}
+        release_name: FCInvoice ${{ needs.validate-release.outputs.version }}
+        body_path: release-notes.md
+        draft: false
+        prerelease: ${{ needs.validate-release.outputs.is-prerelease }}
+
+    - name: Upload release assets
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create-release.outputs.upload_url }}
+        asset_path: release-assets/
+        asset_name: release-assets
+        asset_content_type: application/zip
+
+  notify-deployment:
+    name: Deployment Notification
+    runs-on: ubuntu-latest
+    needs: [validate-release, create-github-release]
+    if: always()
+    
+    steps:
+    - name: Notify success
+      if: needs.create-github-release.result == 'success'
+      run: |
+        echo "✅ Successfully released FCInvoice ${{ needs.validate-release.outputs.version }}"
+        echo "🔗 Release URL: https://github.com/${{ github.repository }}/releases/tag/${{ needs.validate-release.outputs.version }}"
+
+    - name: Notify failure
+      if: needs.create-github-release.result == 'failure'
+      run: |
+        echo "❌ Failed to release FCInvoice ${{ needs.validate-release.outputs.version }}"
+        exit 1

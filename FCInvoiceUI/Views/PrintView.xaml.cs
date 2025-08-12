@@ -1,8 +1,8 @@
-﻿using FCInvoiceUI.Models;
-using FCInvoiceUI.ViewModels;
+﻿using FCInvoice.Core.Models;
+using FCInvoice.UI.ViewModels;
 using System.Windows;
 
-namespace FCInvoiceUI.Views;
+namespace FCInvoice.UI.Views;
 
 /// <summary>
 /// Interaction logic for PrintView.xaml

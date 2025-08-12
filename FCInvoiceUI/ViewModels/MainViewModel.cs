@@ -1,44 +1,68 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using FCInvoiceUI.Models;
-using FCInvoiceUI.Services;
-using FCInvoiceUI.Views;
+using FCInvoice.Core.Interfaces;
+using FCInvoice.Core.Models;
+using FCInvoice.Core.Services;
+using FCInvoice.UI.Services;
+using FCInvoice.UI.Views;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 
-namespace FCInvoiceUI.ViewModels;
+namespace FCInvoice.UI.ViewModels;
 
-// TODO: abstract some functionality to services/helper classes. its getting a little congested..
+/// <summary>
+/// Main view model for invoice creation and editing functionality
+/// </summary>
 public partial class MainViewModel : ObservableObject
 {
     private readonly ComboBoxFormatService _comboBoxService;
+    private readonly IInvoiceNumberGenerator _invoiceNumberGenerator;
     private readonly BillingInvoice _currentInvoiceHolder;
     private BillingInvoice? _originalInvoiceCache;
 
-    public MainViewModel()
+    public MainViewModel() : this(new ComboBoxFormatService(), new InvoiceNumberGeneratorService()) { }
+    
+    public MainViewModel(ComboBoxFormatService comboBoxService) : this(comboBoxService, new InvoiceNumberGeneratorService()) { }
+    
+    public MainViewModel(ComboBoxFormatService comboBoxService, IInvoiceNumberGenerator invoiceNumberGenerator)
     {
-        _comboBoxService = new ComboBoxFormatService();
+        _comboBoxService = comboBoxService;
+        _invoiceNumberGenerator = invoiceNumberGenerator;
 
-        Invoice = new BillingInvoice
-        {
-            InvoiceNumber = InvoiceNumberGeneratorService.GetNextInvoiceNumber(),
-            IsCurrentInvoice = true
-        };
-
+        Invoice = CreateNewInvoice();
         _currentInvoiceHolder = Invoice;
-
-        for (int i = 0; i < 3; i++)
-        {
-            Invoice.Items.Add(new InvoiceItem());
-        }
 
         InitializeInvoiceEventHooks(Invoice);
         LoadComboBoxItems();
+    }
+    
+    /// <summary>
+    /// Creates a new invoice with default values and empty line items
+    /// </summary>
+    /// <returns>New billing invoice ready for editing</returns>
+    private BillingInvoice CreateNewInvoice()
+    {
+        var invoice = new BillingInvoice
+        {
+            InvoiceNumber = _invoiceNumberGenerator.GetNextInvoiceNumber(),
+            IsCurrentInvoice = true
+        };
+
+        // Add three empty line items by default
+        for (int i = 0; i < 3; i++)
+        {
+            invoice.Items.Add(new InvoiceItem());
+        }
+
+        return invoice;
     }
 
     [ObservableProperty]
     private BillingInvoice _invoice;
 
+    /// <summary>
+    /// Customer/company name to bill for this invoice
+    /// </summary>
     public string? BillTo
     {
         get => Invoice.BillTo;
@@ -52,6 +76,9 @@ public partial class MainViewModel : ObservableObject
         }
     }
 
+    /// <summary>
+    /// Project number associated with this invoice
+    /// </summary>
     public string? ProjectNumber
     {
         get => Invoice.ProjectNumber;
@@ -65,6 +92,9 @@ public partial class MainViewModel : ObservableObject
         }
     }
 
+    /// <summary>
+    /// Date for this invoice
+    /// </summary>
     public DateTime SelectedDate
     {
         get => Invoice.SelectedDate;
@@ -78,6 +108,9 @@ public partial class MainViewModel : ObservableObject
         }
     }
 
+    /// <summary>
+    /// Unique invoice number in YYYYNNN format
+    /// </summary>
     public string? InvoiceNumber
     {
         get => Invoice.InvoiceNumber;
@@ -91,8 +124,19 @@ public partial class MainViewModel : ObservableObject
         }
     }
 
+    /// <summary>
+    /// Collection of line items on the current invoice
+    /// </summary>
     public ObservableCollection<InvoiceItem> InvoiceItems => Invoice.Items;
+    
+    /// <summary>
+    /// Calculated total of all line items on the current invoice
+    /// </summary>
     public decimal Total => Invoice.Total;
+    
+    /// <summary>
+    /// Collection of invoices available in the dropdown selector
+    /// </summary>
     public ObservableCollection<BillingInvoice> FilteredInvoices { get; } = [];
 
     private BillingInvoice? _selectedInvoice;
@@ -164,7 +208,7 @@ public partial class MainViewModel : ObservableObject
 
         if (overwriteInvoiceNumber && !Invoice.IsCurrentInvoice)
         {
-            Invoice.InvoiceNumber = defaults.InvoiceNumber ?? InvoiceNumberGeneratorService.GetNextInvoiceNumber();
+            Invoice.InvoiceNumber = defaults.InvoiceNumber ?? _invoiceNumberGenerator.GetNextInvoiceNumber();
         }
 
         Invoice.Items.Clear();
@@ -221,10 +265,20 @@ public partial class MainViewModel : ObservableObject
         }
     }
 
+    /// <summary>
+    /// Opens the print preview window for the current invoice
+    /// </summary>
     [RelayCommand]
     private void OpenPrintPreview()
     {
-        PrintView previewWindow = new(Invoice);
-        previewWindow.ShowDialog();
+        try
+        {
+            PrintView previewWindow = new(Invoice);
+            previewWindow.ShowDialog();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Failed to open print preview: {ex.Message}");
+        }
     }
 }
