@@ -264,6 +264,7 @@ secrets.json
 *.bak
 *.backup
 *.orig
+.claude
 .claude/
 .claude_*
 claude_*
